@@ -1,6 +1,5 @@
 var is = require('type-is')
 var router = require('osprey-router')
-var createError = require('http-errors')
 
 /**
  * Export the mock server.
@@ -86,21 +85,19 @@ function handler (method) {
     }
   })
 
-  return function (req, res, next) {
+  return function (req, res) {
     var type = getType(req.headers.accept, types)
-
-    if (!type) {
-      return next(createError(415, 'Unsupported media type'))
-    }
-
     var body = bodies[type]
 
     res.statusCode = statusCode
     setHeaders(res, headers)
-    res.setHeader('Content-Type', type)
 
-    if (body && body.example) {
-      res.write(body.example)
+    if (type) {
+      res.setHeader('Content-Type', type)
+
+      if (body && body.example) {
+        res.write(body.example)
+      }
     }
 
     res.end()
