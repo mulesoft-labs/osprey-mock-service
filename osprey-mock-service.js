@@ -137,8 +137,8 @@ function getType (contentType, types) {
   for (var i = 0; i < types.length; i++) {
     var type = types[i]
 
-    if (is.is(contentType, type)) {
+    //if (is.is(contentType, type)) {
       return type
-    }
+    //}
   }
 }
