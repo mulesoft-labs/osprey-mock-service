@@ -1,5 +1,5 @@
-var is = require('type-is')
 var router = require('osprey-router')
+var Negotiator = require('negotiator')
 
 /**
  * Export the mock server.
@@ -86,7 +86,8 @@ function handler (method) {
   })
 
   return function (req, res) {
-    var type = getType(req.headers.accept, types)
+    var negotiator = new Negotiator(req)
+    var type = negotiator.mediaType(types)
     var body = bodies[type]
 
     res.statusCode = statusCode
@@ -124,21 +125,4 @@ function setHeaders (res, headers) {
   Object.keys(headers).forEach(function (key) {
     res.setHeader(key, headers[key])
   })
-}
-
-/**
- * Get the correct response type.
- *
- * @param  {String} contentType
- * @param  {Array}  types
- * @return {String}
- */
-function getType (contentType, types) {
-  for (var i = 0; i < types.length; i++) {
-    var type = types[i]
-
-    if (is.is(contentType, type)) {
-      return type
-    }
-  }
 }

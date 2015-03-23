@@ -44,10 +44,10 @@
   },
   "dependencies": {
     "finalhandler": "^0.3.4",
+    "negotiator": "^0.5.1",
     "osprey": "^0.2.0-alpha",
     "osprey-router": "0.0.4",
     "raml-parser": "^0.8.10",
-    "type-is": "^1.6.1",
     "yargs": "^3.5.4"
   }
 }
