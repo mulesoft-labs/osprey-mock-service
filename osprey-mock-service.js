@@ -1,5 +1,6 @@
 var is = require('type-is')
 var router = require('osprey-router')
+var _raml
 
 /**
  * Export the mock server.
@@ -14,6 +15,8 @@ module.exports = ospreyMockServer
  */
 function ospreyMockServer (raml) {
   var app = router()
+
+  _raml = raml
 
   app.use(createResources(raml.resources))
 
@@ -86,7 +89,7 @@ function handler (method) {
   })
 
   return function (req, res) {
-    var type = getType(req.headers.accept, types)
+    var type = getType(types)
     var body = bodies[type]
 
     res.statusCode = statusCode
@@ -133,11 +136,11 @@ function setHeaders (res, headers) {
  * @param  {Array}  types
  * @return {String}
  */
-function getType (contentType, types) {
+function getType (types) {
   for (var i = 0; i < types.length; i++) {
     var type = types[i]
 
-    if (is.is(contentType, type)) {
+    if (_raml.mediaType === type) {
       return type
     }
   }
