@@ -1,6 +1,6 @@
 var is = require('type-is')
 var router = require('osprey-router')
-var _raml;
+var _raml
 
 /**
  * Export the mock server.
@@ -16,7 +16,7 @@ module.exports = ospreyMockServer
 function ospreyMockServer (raml) {
   var app = router()
 
-  _raml = raml;
+  _raml = raml
 
   app.use(createResources(raml.resources))
 
