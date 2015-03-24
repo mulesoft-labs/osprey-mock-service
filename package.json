@@ -48,6 +48,7 @@
     "osprey": "^0.2.0-alpha",
     "osprey-router": "0.0.4",
     "raml-parser": "^0.8.10",
+    "url-parse": "^1.0.0",
     "yargs": "^3.5.4"
   }
 }

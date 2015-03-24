@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 
 var osprey = require('osprey')
+var router = require('osprey-router')
 var parser = require('raml-parser')
 var finalhandler = require('finalhandler')
 var http = require('http')
+var parse = require('url-parse')
 var mock = require('../')
 
 var argv = require('yargs')
@@ -19,11 +21,15 @@ var argv = require('yargs')
 
 parser.loadFile(argv.f)
   .then(function (raml) {
-    var app = osprey.createServer(raml, {
-      documentationPath: argv.docs
-    })
+    var app = router()
+    var path = parse(raml.baseUri || '').pathname || '/'
 
-    app.use(mock(raml))
+    var options = {
+      documentationPath: argv.docs
+    }
+
+    app.use(path, osprey.createServer(raml, options))
+    app.use(path, mock(raml))
 
     var server = http.createServer(function (req, res) {
       app(req, res, finalhandler(req, res))
@@ -31,7 +37,7 @@ parser.loadFile(argv.f)
 
     server.listen(argv.p)
 
-    console.log('Mock service is now listening on port ' + server.address().port)
+    console.log('Mock service running at http://localhost:' + server.address().port + path)
   })
   .catch(function (err) {
     console.log(err && err.stack || err.message)

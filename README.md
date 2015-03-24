@@ -15,7 +15,7 @@ Generate an API mock service from a RAML definition using Osprey.
 npm install -g osprey-mock-service
 ```
 
-Start the service from the CLI.
+Start the service from the CLI. This will automatically use the `baseUri` as the path to the mock service. For example, `http://example.com/api` will result in `http://localhost:{PORT}/api`.
 
 ```
 osprey-mock-service -f api.raml -p 8000
