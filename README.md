@@ -7,15 +7,15 @@
 
 Generate an API mock service from a RAML definition using Osprey.
 
-## Installation
-
-```sh
-npm install osprey-mock-service --save
-```
-
 ## Usage
 
-### Global
+### Global (CLI)
+
+```
+npm install -g osprey-mock-service
+```
+
+Start the service from the CLI.
 
 ```
 osprey-mock-service -f api.raml -p 8000
@@ -26,7 +26,7 @@ osprey-mock-service -f api.raml -p 8000
 * `-f` Path to the root RAML definition (E.g. `/path/to/api.raml`)
 * `-p` Port number to bind the server locally
 
-### Locally
+### Locally (JavaScript)
 
 ```
 npm install osprey-mock-service --save
