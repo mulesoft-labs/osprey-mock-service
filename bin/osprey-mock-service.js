@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 
-var parser = require('raml-parser')
-var finalhandler = require('finalhandler')
 var http = require('http')
-var parse = require('url-parse')
+var finalhandler = require('finalhandler')
 var mock = require('../')
 
 var argv = require('yargs')
@@ -17,23 +15,19 @@ var argv = require('yargs')
   .describe('docs', 'Serve documentation from a path')
   .argv
 
-parser.loadFile(argv.f)
-  .then(function (raml) {
-    var path = parse(raml.baseUri || '').pathname || '/'
+var options = {
+  documentationPath: argv.docs
+}
 
-    var options = {
-      documentationPath: argv.docs
-    }
-
-    var app = mock.createServer(raml, options)
-
+mock.loadFile(argv.f, options)
+  .then(function (app) {
     var server = http.createServer(function (req, res) {
       app(req, res, finalhandler(req, res))
     })
 
     server.listen(argv.p)
 
-    console.log('Mock service running at http://localhost:' + server.address().port + path)
+    console.log('Mock service running at http://localhost:' + server.address().port)
   })
   .catch(function (err) {
     console.log(err && err.stack || err.message)

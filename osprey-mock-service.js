@@ -6,6 +6,8 @@ var Negotiator = require('negotiator')
  */
 module.exports = ospreyMockServer
 module.exports.createServer = createServer
+module.exports.createServerFromBaseUri = createServerFromBaseUri
+module.exports.loadFile = loadFile
 
 /**
  * Create an Osprey server instance.
@@ -36,6 +38,38 @@ function createServer (raml, options) {
   app.use(ospreyMockServer(raml))
 
   return app
+}
+
+/**
+ * Create a mock service using the base uri path.
+ *
+ * @param  {Object}   raml
+ * @param  {Object}   options
+ * @return {Function}
+ */
+function createServerFromBaseUri (raml, options) {
+  var app = router()
+  var parse = require('url-parse')
+  var path = parse(raml.baseUri || '').pathname || '/'
+
+  app.use(path, createServer(raml, options))
+
+  return app
+}
+
+/**
+ * Create a mock service from a filename.
+ *
+ * @param  {String}   filename
+ * @param  {Object}   options
+ * @return {Function}
+ */
+function loadFile (filename, options) {
+  return require('raml-parser')
+    .loadFile(filename)
+    .then(function (raml) {
+      return createServerFromBaseUri(raml, options)
+    })
 }
 
 /**
