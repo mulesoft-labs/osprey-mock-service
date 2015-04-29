@@ -5,6 +5,7 @@ var Negotiator = require('negotiator')
  * Export the mock server.
  */
 module.exports = ospreyMockServer
+module.exports.createServer = createServer
 
 /**
  * Create an Osprey server instance.
@@ -16,6 +17,23 @@ function ospreyMockServer (raml) {
   var app = router()
 
   app.use(createResources(raml.resources))
+
+  return app
+}
+
+/**
+ * Create a server with Osprey and the mock service.
+ *
+ * @param  {Object}   raml
+ * @param  {Object}   options
+ * @return {Function}
+ */
+function createServer (raml, options) {
+  var app = router()
+  var osprey = require('osprey')
+
+  app.use(osprey.createServer(raml, options))
+  app.use(ospreyMockServer(raml))
 
   return app
 }

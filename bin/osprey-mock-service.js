@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-var osprey = require('osprey')
-var router = require('osprey-router')
 var parser = require('raml-parser')
 var finalhandler = require('finalhandler')
 var http = require('http')
@@ -21,15 +19,13 @@ var argv = require('yargs')
 
 parser.loadFile(argv.f)
   .then(function (raml) {
-    var app = router()
     var path = parse(raml.baseUri || '').pathname || '/'
 
     var options = {
       documentationPath: argv.docs
     }
 
-    app.use(path, osprey.createServer(raml, options))
-    app.use(path, mock(raml))
+    var app = mock.createServer(raml, options)
 
     var server = http.createServer(function (req, res) {
       app(req, res, finalhandler(req, res))
