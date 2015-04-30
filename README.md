@@ -52,8 +52,8 @@ parser.loadFile(__dirname + '/api.raml')
 #### Additional methods
 
 * `createServer` Creates a mock service instance with Osprey
-* `createServerFromBaseUri` Creates a mock service instance with Osprey taking into account the RAML `baseURi`
-* `loadFile` Creates a mock service with Osprey and the base URI from a RAML file
+* `createServerFromBaseUri` Creates a mock service with Osprey and uses the base URI path
+* `loadFile` Creates a mock service with Osprey and the base URI path from a RAML file
 
 ## License
 
