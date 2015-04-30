@@ -1,6 +1,6 @@
 {
   "name": "osprey-mock-service",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Generate an API mock service from a RAML definition using Osprey",
   "main": "osprey-mock-service.js",
   "files": [
