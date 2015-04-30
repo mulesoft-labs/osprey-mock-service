@@ -49,8 +49,7 @@ function createServer (raml, options) {
  */
 function createServerFromBaseUri (raml, options) {
   var app = router()
-  var parse = require('url-parse')
-  var path = parse(raml.baseUri || '').pathname || '/'
+  var path = (raml.baseUri || '').replace(/^(\w+:)?\/\/[^\/]+/, '') || '/'
 
   app.use(path, createServer(raml, options))
 
