@@ -46,7 +46,7 @@
     "finalhandler": "^0.3.4",
     "negotiator": "^0.5.1",
     "osprey": "^0.2.0-alpha",
-    "osprey-router": "0.0.4",
+    "osprey-router": "^0.0.5",
     "raml-parser": "^0.8.10",
     "yargs": "^3.5.4"
   }
