@@ -122,7 +122,7 @@ function createResource (resource) {
  */
 function handler (method) {
   var statusCode = getStatusCode(method)
-  var response = method.responses[statusCode] || {}
+  var response = (method.responses || {})[statusCode] || {}
   var bodies = response.body || {}
   var headers = {}
   var types = Object.keys(bodies)
