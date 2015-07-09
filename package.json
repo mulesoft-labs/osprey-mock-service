@@ -36,18 +36,18 @@
   },
   "homepage": "https://github.com/mulesoft-labs/osprey-mock-service",
   "devDependencies": {
-    "chai": "^2.1.1",
+    "chai": "^3.0.0",
     "istanbul": "^0.3.5",
     "mocha": "^2.1.0",
     "pre-commit": "^1.0.1",
-    "standard": "^3.1.2"
+    "standard": "^4.5.2"
   },
   "dependencies": {
-    "finalhandler": "^0.3.4",
+    "finalhandler": "^0.4.0",
     "negotiator": "^0.5.1",
     "osprey": "^0.2.0-alpha",
     "osprey-resources": "^0.3.0",
-    "osprey-router": "^0.0.5",
+    "osprey-router": "^0.1.0",
     "raml-parser": "^0.8.10",
     "yargs": "^3.5.4"
   }
