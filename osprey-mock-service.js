@@ -1,6 +1,6 @@
-var router = require('osprey-router')
 var Negotiator = require('negotiator')
 var resources = require('osprey-resources')
+var osprey = require('osprey')
 
 /**
  * Export the mock server.
@@ -28,10 +28,9 @@ function ospreyMockServer (raml) {
  * @return {Function}
  */
 function createServer (raml, options) {
-  var osprey = require('osprey')
-  var app = router()
+  var app = osprey.Router()
 
-  app.use(osprey.createServer(raml, options))
+  app.use(osprey.server(raml, options))
   app.use(ospreyMockServer(raml))
 
   return app
@@ -45,7 +44,7 @@ function createServer (raml, options) {
  * @return {Function}
  */
 function createServerFromBaseUri (raml, options) {
-  var app = router()
+  var app = osprey.Router()
   var path = (raml.baseUri || '').replace(/^(\w+:)?\/\/[^\/]+/, '') || '/'
 
   app.use(path, createServer(raml, options))
