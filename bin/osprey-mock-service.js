@@ -7,16 +7,16 @@ var mock = require('../')
 var argv = require('yargs')
   .usage(
     'Generate an API mock server from a RAML definition.\n\n' +
-    'Usage: $0 -f [file] -p [port number]'
+    'Usage: $0 -f [file] -p [port number] --cors'
   )
   .demand(['f', 'p'])
   .describe('f', 'Path to the RAML definition')
   .describe('p', 'Port number to bind the proxy')
-  .describe('docs', 'Serve documentation from a path')
+  .describe('cors', 'Enable CORS with the API')
   .argv
 
 var options = {
-  documentationPath: argv.docs
+  cors: !!argv.cors
 }
 
 mock.loadFile(argv.f, options)
