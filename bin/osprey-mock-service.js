@@ -22,6 +22,17 @@ var options = {
 mock.loadFile(argv.f, options)
   .then(function (app) {
     var server = http.createServer(function (req, res) {
+      
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Request-Method', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'POST, PUT, DELETE, GET, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+      if ( req.method === 'OPTIONS' ) {
+        res.writeHead(200);
+        res.end();
+        return;
+      }
+      
       app(req, res, finalhandler(req, res))
     })
 
