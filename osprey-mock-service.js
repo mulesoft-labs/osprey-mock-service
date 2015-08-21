@@ -32,6 +32,7 @@ function createServer (raml, options) {
 
   app.use(osprey.server(raml, options))
   app.use(ospreyMockServer(raml))
+  app.use(osprey.errorHandler())
 
   return app
 }
