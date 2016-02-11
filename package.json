@@ -40,7 +40,7 @@
     "istanbul": "^0.4.1",
     "mocha": "^2.1.0",
     "pre-commit": "^1.0.1",
-    "standard": "^5.4.1"
+    "standard": "^6.0.4"
   },
   "dependencies": {
     "finalhandler": "^0.4.0",
