@@ -3,6 +3,8 @@
 var http = require('http')
 var finalhandler = require('finalhandler')
 var mock = require('../')
+var Router = require('osprey').Router
+var morgan = require('morgan')
 
 var argv = require('yargs')
   .usage(
@@ -21,13 +23,19 @@ var options = {
 
 mock.loadFile(argv.f, options)
   .then(function (app) {
+    var router = new Router()
+
+    // Log API requests.
+    router.use(morgan('combined'))
+    router.use(app)
+
     var server = http.createServer(function (req, res) {
-      app(req, res, finalhandler(req, res))
+      router(req, res, finalhandler(req, res))
     })
 
-    server.listen(argv.p)
-
-    console.log('Mock service running at http://localhost:' + server.address().port)
+    server.listen(argv.p, function () {
+      console.log('Mock service running at http://localhost:' + server.address().port)
+    })
   })
   .catch(function (err) {
     console.log(err && err.stack || err.message)
