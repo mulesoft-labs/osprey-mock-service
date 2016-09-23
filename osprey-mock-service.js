@@ -61,9 +61,12 @@ function createServerFromBaseUri (raml, options) {
  * @return {Function}
  */
 function loadFile (filename, options) {
-  return require('raml-parser')
-    .loadFile(filename)
+  return require('raml-1-parser')
+    .loadRAML(filename, { rejectOnErrors: true })
     .then(function (raml) {
+        var raml = raml.expand(true).toJSON({
+          serializeMetadata: false
+        })
       return createServerFromBaseUri(raml, options)
     })
 }
@@ -101,8 +104,9 @@ function handler (method) {
     if (type) {
       res.setHeader('Content-Type', type)
 
-      if (body && body.example) {
-        res.write(body.example)
+      var example = body.example;
+      if (body && example) {
+        res.write(typeof example === "object" ? JSON.stringify(example) : example)
       }
     }
 
