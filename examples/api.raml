@@ -1,0 +1,14 @@
+#%RAML 1.0
+title: Example API
+baseUri: http://example.com/api
+
+/test:
+  get:
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+               {
+                 "success": true
+               }
