@@ -1,48 +1,54 @@
-/* global describe, it */
+/* global describe, it, beforeEach */
 
 var expect = require('chai').expect
 var mockService = require('../')
-var router = require('osprey-router')
 var popsicle = require('popsicle')
 var server = require('popsicle-server')
-var express = require('express')
-var osprey = require('osprey')
-var app = express()
+var finalhandler = require('finalhandler')
+var httpes = require('http')
+var path = require('path')
 
 describe('osprey mock service', function () {
-    var ENDPOINT = '';
-    var http
-    //var app
+  var http
 
-    before(function () {
-        //app = router()
-        return mockService.loadFile(__dirname + '/fixtures/example.raml')
-            .then(function (raml) {
-                app.use(mockService(raml))
-                //app.listen(3000)
-                //http = mockService.createServer(raml)
-            })
+  beforeEach(function () {
+    return mockService.loadFile(path.join(__dirname, '/fixtures/example.raml'), { server: { cors: true, compression: true } })
+      .then(function (raml) {
+        http = httpes.createServer(function (req, res) {
+          return raml(req, res, finalhandler(req, res))
+        })
+      })
+  })
+
+  describe('routes', function () {
+    it('should expose a function', function () {
+      expect(mockService).to.be.a('function')
     })
-    describe('routes', function () {
 
-        it('should expose a function', function () {
-            expect(mockService).to.be.a('function')
-        })
-
-        it('should respond with example parameter', function () {
-            popsicle.get(ENDPOINT + '/test')
-                .then(function (res) {
-                    expect(JSON.parse(res.body)).to.have.any.keys('success')
-                    expect(res.status).to.equal(200)
-                })
-        })
-
-        it('should reject undefined route', function () {
-            popsicle.get(ENDPOINT + '/unknown')
-                .use(server(app))
-                .then(function (res) {
-                    expect(res.status).to.equal(404)
-                })
+    it('should respond with example parameter', function () {
+      return popsicle.default('/api/test')
+        .use(server(http))
+        .then(function (res) {
+          expect(JSON.parse(res.body)).to.have.any.keys('success')
+          expect(res.status).to.equal(200)
         })
     })
+
+    it('should reject undefined route', function () {
+      return popsicle.default('/api/unknown')
+        .use(server(http))
+        .then(function (res) {
+          expect(res.status).to.equal(404)
+        })
+    })
+
+    it('should have empty body when no example parameter available', function () {
+      return popsicle.default('/api/noexample')
+        .use(server(http))
+        .then(function (res) {
+          expect(res.status).to.equal(200)
+          expect(res.body).to.equal('')
+        })
+    })
+  })
 })
