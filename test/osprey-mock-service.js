@@ -29,7 +29,7 @@ describe('osprey mock service', function () {
       return popsicle.default('/api/test')
         .use(server(http))
         .then(function (res) {
-          expect(JSON.parse(res.body)).to.have.any.keys('success')
+          expect(JSON.parse(res.body)).to.deep.equal({success: true})
           expect(res.status).to.equal(200)
         })
     })
@@ -47,7 +47,7 @@ describe('osprey mock service', function () {
         .use(server(http))
         .then(function (res) {
           expect(res.status).to.equal(200)
-          expect(res.body).to.equal('')
+          expect(res.body).to.be.empty
         })
     })
   })
