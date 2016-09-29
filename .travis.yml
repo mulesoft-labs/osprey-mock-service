@@ -6,9 +6,7 @@ notifications:
     on_failure: change
 
 node_js:
-  - "4.6.0"
-  - "4.4.2"
-  - "2.3.0"
   - "0.12"
+  - "4"
 
 after_script: "npm install coveralls@2 && cat ./coverage/lcov.info | coveralls"
