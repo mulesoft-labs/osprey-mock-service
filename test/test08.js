@@ -8,11 +8,11 @@ var finalhandler = require('finalhandler')
 var httpes = require('http')
 var path = require('path')
 
-describe('osprey mock service', function () {
+describe('osprey mock service v0.8', function () {
   var http
 
   beforeEach(function () {
-    return mockService.loadFile(path.join(__dirname, '/fixtures/example.raml'), { server: { cors: true, compression: true } })
+    return mockService.loadFile(path.join(__dirname, '/fixtures/example08.raml'), { server: { cors: true, compression: true } })
       .then(function (raml) {
         http = httpes.createServer(function (req, res) {
           return raml(req, res, finalhandler(req, res))
