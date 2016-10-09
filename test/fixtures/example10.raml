@@ -1,50 +1,40 @@
 #%RAML 1.0
-title: API with Examples
+title: Example API
 baseUri: http://example.com/api
 
-types:
-  User:
-    type: object
-    properties:
-      name: string
-      lastname: string
-    example:
-      name: Bob
-      lastname: Marley
-  Org:
-    type: object
-    properties:
-      name: string
-      address?: string
-      value?: string
-/organization:
-  post:
+/test:
+  get:
     headers:
       Location:
-        example: /invoices/45612
-    body:
-      application/json:
-        type: Org
-        example: # single request body example
-          value: # needs to be declared since instance contains a 'value' property
-            name: Doe Enterprise
-            value: Silver
-  get:
-    description: Returns an organization entity.
-    headers:
-      Authorization:
-        description: |
-           Used to send a valid OAuth 2 access token. Do not use
-           with the "access_token" query string parameter.
-        type: string
+        default: /test
     responses:
       200:
         body:
           application/json:
-            type: Org
+            example:
+              success: true
+
+/nested:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              nested:
+                success: true
+
+/examples:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
             examples:
-              success:
-                name: Working
+              example1:
+                name: example1
+              example2:
+                name: example2
 
 /noexample:
   get:

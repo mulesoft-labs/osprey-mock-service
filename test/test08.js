@@ -42,7 +42,7 @@ describe('osprey mock service v0.8', function () {
         })
     })
 
-    it('should have empty body when no example parameter available', function () {
+    it('should have empty body when there are no example property', function () {
       return popsicle.default('/api/noexample')
         .use(server(http))
         .then(function (res) {

@@ -25,36 +25,56 @@ describe('osprey mock service v1.0', function () {
       expect(mockService).to.be.a('function')
     })
 
-    it('headers', function () {
-      return popsicle.default(
-        {
-          method: 'POST',
-          url: '/api/organization',
-          headers: {
-            'Content-type': 'application/json',
-            'Location': 'World'
-          }
-        }
-      )
-      .use(server(http))
-      .then(function (res) {
-        expect(res.rawHeaders).to.contain('Location')
-      })
-    })
-
     it('should respond with example parameter', function () {
       return popsicle.default(
         {
           method: 'GET',
-          url: '/api/organization',
-          headers: {
-            'Authorization': 'Bearer 1234'
-          }
+          url: '/api/test'
         }
       )
       .use(server(http))
       .then(function (res) {
-        expect(JSON.parse(res.body)[0].name).to.deep.equal('success')
+        expect(res.headers.location).to.equal('/test')
+        expect(JSON.parse(res.body)).to.deep.equal({success: true})
+        expect(res.status).to.equal(200)
+      })
+    })
+
+    it('should respond with nested example parameter', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/nested'
+        }
+      )
+      .use(server(http))
+      .then(function (res) {
+        expect(JSON.parse(res.body)).to.deep.equal({nested: {success: true}})
+        expect(res.status).to.equal(200)
+      })
+    })
+
+    it('should respond with multiple examples', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/examples'
+        }
+      )
+      .use(server(http))
+      .then(function (res) {
+        expect(JSON.parse(res.body)).to.deep.equal([
+          {
+            example1: {
+              name: 'example1'
+            }
+          },
+          {
+            example2: {
+              name: 'example2'
+            }
+          }
+        ])
         expect(res.status).to.equal(200)
       })
     })
@@ -67,7 +87,7 @@ describe('osprey mock service v1.0', function () {
         })
     })
 
-    it('should have empty body when no example parameter available', function () {
+    it('should have empty body when there are no example property', function () {
       return popsicle.default('/api/noexample')
         .use(server(http))
         .then(function (res) {
