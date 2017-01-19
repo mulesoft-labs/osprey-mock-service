@@ -11,6 +11,16 @@ module.exports.createServerFromBaseUri = createServerFromBaseUri
 module.exports.loadFile = loadFile
 
 /**
+ * Default network delay duration ms
+ */
+var DEFAULT_DELAY = 1400
+
+/**
+ * Options reference variable
+ */
+var args
+
+/**
  * Create an Osprey server instance.
  *
  * @param  {Object}   raml
@@ -61,6 +71,7 @@ function createServerFromBaseUri (raml, options) {
  * @return {Function}
  */
 function loadFile (filename, options) {
+  args = options
   return require('raml-parser')
     .loadFile(filename)
     .then(function (raml) {
@@ -100,13 +111,14 @@ function handler (method) {
 
     if (type) {
       res.setHeader('Content-Type', type)
+    }
 
+    simulateDelay(function () {
       if (body && body.example) {
         res.write(body.example)
       }
-    }
-
-    res.end()
+      res.end()
+    })
   }
 }
 
@@ -130,4 +142,17 @@ function setHeaders (res, headers) {
   Object.keys(headers).forEach(function (key) {
     res.setHeader(key, headers[key])
   })
+}
+
+/**
+ * Simulate Delayed response
+ *
+ * @param  {Function} fn
+ */
+function simulateDelay (fn) {
+  if (!args.delay) {
+    return fn()
+  }
+  var delay = typeof args.delay === 'number' ? args.delay : DEFAULT_DELAY
+  setTimeout(fn, delay)
 }

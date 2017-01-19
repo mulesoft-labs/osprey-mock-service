@@ -9,16 +9,18 @@ var morgan = require('morgan')
 var argv = require('yargs')
   .usage(
     'Generate an API mock server from a RAML definition.\n\n' +
-    'Usage: $0 -f [file] -p [port number] --cors'
+    'Usage: $0 -f [file] -p [port number] --cors --simulate-delay'
   )
   .demand(['f', 'p'])
   .describe('f', 'Path to the RAML definition')
   .describe('p', 'Port number to bind the proxy')
   .describe('cors', 'Enable CORS with the API')
+  .describe('simulate-delay', 'Simulate slow network condition. Default 1400ms')
   .argv
 
 var options = {
-  cors: !!argv.cors
+  cors: !!argv.cors,
+  delay: argv.simulateDelay
 }
 
 mock.loadFile(argv.f, options)
