@@ -46,7 +46,7 @@ function createServer (raml, options) {
  */
 function createServerFromBaseUri (raml, options) {
   var app = osprey.Router()
-  var path = (raml.baseUri || '').replace(/^(\w+:)?\/\/[^\/]+/, '') || '/'
+  var path = (raml.baseUri || '').replace(/^(\w+:)?\/\/[^/]+/, '') || '/'
 
   app.use(path, raml.baseUriParameters, createServer(raml, options))
 
@@ -61,9 +61,12 @@ function createServerFromBaseUri (raml, options) {
  * @return {Function}
  */
 function loadFile (filename, options) {
-  return require('raml-parser')
-    .loadFile(filename)
-    .then(function (raml) {
+  return require('raml-1-parser')
+    .loadRAML(filename, { rejectOnErrors: true })
+    .then(function (ramlApi) {
+      var raml = ramlApi.expand(true).toJSON({
+        serializeMetadata: false
+      })
       return createServerFromBaseUri(raml, options)
     })
 }
@@ -78,13 +81,12 @@ function handler (method) {
   var statusCode = getStatusCode(method)
   var response = (method.responses || {})[statusCode] || {}
   var bodies = response.body || {}
-  var headers = {}
+  var headers = response.headers || method.headers || {}
   var types = Object.keys(bodies)
 
   // Set up the default response headers.
-  Object.keys(response.headers || {}).forEach(function (key) {
-    var value = response.headers[key]
-
+  Object.keys(headers).forEach(function (key) {
+    var value = headers[key]
     if (value && value.default) {
       headers[key] = value.default
     }
@@ -100,9 +102,21 @@ function handler (method) {
 
     if (type) {
       res.setHeader('Content-Type', type)
+      var example = body.example
 
-      if (body && body.example) {
-        res.write(body.example)
+      // Parse body.examples.
+      if (Array.isArray(body.examples)) {
+        example = []
+
+        body.examples.forEach(function (ex) {
+          var obj = {}
+          obj[ex.name] = ex.structuredValue
+          example.push(obj)
+        })
+      }
+
+      if (example) {
+        res.write(typeof example === 'object' ? JSON.stringify(example) : example)
       }
     }
 

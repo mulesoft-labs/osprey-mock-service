@@ -18,7 +18,7 @@ npm install -g osprey-mock-service
 Start the service from the CLI. This will automatically use the `baseUri` as the path to the mock service. For example, `http://example.com/api` will result in `http://localhost:{PORT}/api`.
 
 ```
-osprey-mock-service -f api.raml -p 8000
+osprey-mock-service -f api.raml -p 3000
 ```
 
 **Options**
@@ -35,18 +35,22 @@ npm install osprey-mock-service --save
 The mocking service simply accepts a RAML definition and returns a router that can be mounted into any Connect-style middleware layer or even used with `http`. Best used with `osprey` to support incoming validation automatically.
 
 ```js
-var mockService = require('osprey-mock-service')
+var mockService = require('../osprey-mock-service')
 var express = require('express')
-var parser = require('raml-parser')
+var parser = require('raml-1-parser')
+var path = require('path')
+var osprey = require('osprey')
 
 var app = express()
 
-parser.loadFile(__dirname + '/api.raml')
-  .then(function (raml) {
-    app.use(osprey.createServer(raml))
+parser.loadRAML(path.join(__dirname, 'api.raml'), { rejectOnErrors: true })
+  .then(function (ramlApi) {
+    var raml = ramlApi.expand(true).toJSON({ serializeMetadata: false })
+    app.use(osprey.server(raml))
     app.use(mockService(raml))
     app.listen(3000)
   })
+
 ```
 
 #### Additional methods
@@ -54,6 +58,11 @@ parser.loadFile(__dirname + '/api.raml')
 * `createServer` Creates a mock service instance with Osprey
 * `createServerFromBaseUri` Creates a mock service with Osprey and uses the base URI path
 * `loadFile` Creates a mock service with Osprey and the base URI path from a RAML file
+
+### Limitation
+
+#### RAML 1.0
+This module only uses the `example` (or `examples`) property inside a given resource/method body. It does not take into consideration any of the `example` properties defined inside the `properties` or `schema` of the body itself.
 
 ## License
 

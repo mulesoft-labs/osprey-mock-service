@@ -1,0 +1,44 @@
+#%RAML 1.0
+title: Example API
+baseUri: http://example.com/api
+
+/test:
+  get:
+    headers:
+      Location:
+        default: /test
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              success: true
+
+/nested:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              nested:
+                success: true
+
+/examples:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            examples:
+              example1:
+                name: example1
+              example2:
+                name: example2
+
+/noexample:
+  get:
+    responses:
+      200:
+        body:
+         application/json:

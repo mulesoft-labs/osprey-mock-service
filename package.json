@@ -1,6 +1,6 @@
 {
   "name": "osprey-mock-service",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Generate an API mock service from a RAML definition using Osprey",
   "main": "osprey-mock-service.js",
   "files": [
@@ -36,19 +36,21 @@
   },
   "homepage": "https://github.com/mulesoft-labs/osprey-mock-service",
   "devDependencies": {
-    "chai": "^3.0.0",
-    "istanbul": "^0.4.1",
-    "mocha": "^2.1.0",
+    "chai": "^3.5.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.1.0",
     "pre-commit": "^1.0.1",
-    "standard": "^6.0.4"
+    "standard": "^8.3.0",
+    "popsicle": "^8.2.0",
+    "popsicle-server": "^2.0.0"
   },
   "dependencies": {
     "finalhandler": "^0.4.0",
     "morgan": "^1.7.0",
     "negotiator": "^0.6.0",
-    "osprey": "^0.3.0",
+    "osprey": "mulesoft/osprey#raml1.0",
     "osprey-resources": "^0.7.0",
-    "raml-parser": "^0.8.10",
+    "raml-1-parser": "^1.1.11",
     "yargs": "^4.1.0"
   }
 }
