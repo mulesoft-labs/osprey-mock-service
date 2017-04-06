@@ -48,9 +48,9 @@
     "finalhandler": "^0.4.0",
     "morgan": "^1.7.0",
     "negotiator": "^0.6.0",
-    "osprey": "^0.4.0",
-    "osprey-resources": "^0.7.0",
-    "raml-1-parser": "^1.1.15",
+    "osprey": "mulesoft/osprey#raml1.0-fixes",
+    "osprey-resources": "mulesoft-labs/osprey-resources#raml1.0-fixes",
+    "raml-1-parser": "^1.1.x",
     "yargs": "^4.1.0"
   }
 }
