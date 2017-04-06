@@ -12,6 +12,7 @@ describe('osprey mock service v0.8', function () {
   var http
 
   beforeEach(function () {
+    this.timeout(3000)
     return mockService.loadFile(path.join(__dirname, '/fixtures/example08.raml'), { server: { cors: true, compression: true } })
       .then(function (raml) {
         http = httpes.createServer(function (req, res) {
