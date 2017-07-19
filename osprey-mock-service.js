@@ -89,23 +89,25 @@ function handler (method) {
   if (Array.isArray(headers)) {
     var headersMap = {}
     headers.forEach(function (header) {
-      if (!header)
-        return
-      if (header.default)
+      if (!header) { return }
+      if (header.default) {
         headersMap[header.name] = header.default
-      else if (header.example)
+      } else if (header.example) {
         headersMap[header.name] = header.example
+      }
     })
     headers = headersMap
   } else {
     Object.keys(headers).forEach(function (key) {
       var value = headers[key]
-      if (!value)
+      if (!value) {
         return
-      if (value.default)
+      }
+      if (value.default) {
         headers[key] = value.default
-      else if (value.example)
+      } else if (value.example) {
         headers[key] = value.example
+      }
     })
   }
 
