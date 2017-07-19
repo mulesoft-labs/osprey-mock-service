@@ -86,12 +86,28 @@ function handler (method) {
   var types = Object.keys(bodies)
 
   // Set up the default response headers.
-  Object.keys(headers).forEach(function (key) {
-    var value = headers[key]
-    if (value && value.default) {
-      headers[key] = value.default
-    }
-  })
+  if (Array.isArray(headers)) {
+    var headersMap = {}
+    headers.forEach(function (header) {
+      if (!header)
+        return
+      if (header.default)
+        headersMap[header.name] = header.default
+      else if (header.example)
+        headersMap[header.name] = header.example
+    })
+    headers = headersMap
+  } else {
+    Object.keys(headers).forEach(function (key) {
+      var value = headers[key]
+      if (!value)
+        return
+      if (value.default)
+        headers[key] = value.default
+      else if (value.example)
+        headers[key] = value.example
+    })
+  }
 
   return function (req, res) {
     var negotiator = new Negotiator(req)
