@@ -82,24 +82,13 @@ function handler (method) {
   var statusCode = getStatusCode(method)
   var response = (method.responses || {})[statusCode] || {}
   var bodies = response.body || {}
-  var headers = response.headers || method.headers || {}
+  var headers = {}
   var types = Object.keys(bodies)
 
   // Set up the default response headers.
-  if (Array.isArray(headers)) {
-    var headersMap = {}
-    headers.forEach(function (header) {
-      if (!header) { return }
-      if (header.default) {
-        headersMap[header.name] = header.default
-      } else if (header.example) {
-        headersMap[header.name] = header.example
-      }
-    })
-    headers = headersMap
-  } else {
-    Object.keys(headers).forEach(function (key) {
-      var value = headers[key]
+  if (method.headers) {
+    Object.keys(method.headers).forEach(function (key) {
+      var value = method.headers[key]
       if (!value) {
         return
       }
@@ -107,6 +96,18 @@ function handler (method) {
         headers[key] = value.default
       } else if (value.example) {
         headers[key] = value.example
+      }
+    })
+  }
+  if (Array.isArray(response.headers)) {
+    response.headers.forEach(function (header) {
+      if (!header) {
+        return
+      }
+      if (header.default) {
+        headers[header.name] = header.default
+      } else if (header.example) {
+        headers[header.name] = header.example
       }
     })
   }
