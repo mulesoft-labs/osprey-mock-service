@@ -82,16 +82,17 @@ function handler (method) {
   var statusCode = getStatusCode(method)
   var response = (method.responses || {})[statusCode] || {}
   var bodies = response.body || {}
-  var headers = response.headers || method.headers || {}
+  var headers = {}
   var types = Object.keys(bodies)
 
   // Set up the default response headers.
-  Object.keys(headers).forEach(function (key) {
-    var value = headers[key]
-    if (value && value.default) {
-      headers[key] = value.default
-    }
-  })
+  if (Array.isArray(response.headers)) {
+    response.headers.forEach(function (header) {
+      if (header && header.example) {
+        headers[header.name] = header.example
+      }
+    })
+  }
 
   return function (req, res) {
     var negotiator = new Negotiator(req)

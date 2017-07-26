@@ -4,11 +4,11 @@ baseUri: http://example.com/api
 
 /test:
   get:
-    headers:
-      Location:
-        default: /test
     responses:
       200:
+        headers:
+          Location:
+            example: /test
         body:
           application/json:
             example:
