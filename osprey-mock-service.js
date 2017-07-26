@@ -86,27 +86,9 @@ function handler (method) {
   var types = Object.keys(bodies)
 
   // Set up the default response headers.
-  if (method.headers) {
-    Object.keys(method.headers).forEach(function (key) {
-      var value = method.headers[key]
-      if (!value) {
-        return
-      }
-      if (value.default) {
-        headers[key] = value.default
-      } else if (value.example) {
-        headers[key] = value.example
-      }
-    })
-  }
   if (Array.isArray(response.headers)) {
     response.headers.forEach(function (header) {
-      if (!header) {
-        return
-      }
-      if (header.default) {
-        headers[header.name] = header.default
-      } else if (header.example) {
+      if (header && header.example) {
         headers[header.name] = header.example
       }
     })
