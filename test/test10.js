@@ -35,7 +35,6 @@ describe('osprey mock service v1.0', function () {
       )
       .use(server(http))
       .then(function (res) {
-        expect(res.headers.location).to.equal('/test')
         expect(JSON.parse(res.body)).to.deep.equal({success: true})
         expect(res.status).to.equal(200)
       })
@@ -95,6 +94,45 @@ describe('osprey mock service v1.0', function () {
           expect(res.status).to.equal(200)
           expect(res.body).to.be.empty
         })
+    })
+
+    it('should respond with header \'foo\' being of value \'test\'', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/headersdefaultbeforeexample'
+        }
+      )
+      .use(server(http))
+      .then(function (res) {
+        expect(res.headers.foo).to.equal('test')
+      })
+    })
+
+    it('should respond with header \'foo\' being of value \'test\'', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/headersdefault'
+        }
+      )
+      .use(server(http))
+      .then(function (res) {
+        expect(res.headers.foo).to.equal('test')
+      })
+    })
+
+    it('should respond with header \'foo\' being of value \'bar\'', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/headersexample'
+        }
+      )
+      .use(server(http))
+      .then(function (res) {
+        expect(res.headers.foo).to.equal('bar')
+      })
     })
   })
 })

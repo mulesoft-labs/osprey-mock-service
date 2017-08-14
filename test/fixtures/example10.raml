@@ -4,9 +4,6 @@ baseUri: http://example.com/api
 
 /test:
   get:
-    headers:
-      Location:
-        default: /test
     responses:
       200:
         body:
@@ -42,3 +39,28 @@ baseUri: http://example.com/api
       200:
         body:
          application/json:
+
+/headersdefaultbeforeexample:
+  get:
+    responses:
+      200:
+        headers:
+          foo:
+            example: bar
+            default: test
+
+/headersexample:
+  get:
+    responses:
+      200:
+        headers:
+          foo:
+            example: bar
+
+/headersdefault:
+  get:
+    responses:
+      200:
+        headers:
+          foo:
+            default: test
