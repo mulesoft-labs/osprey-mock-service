@@ -96,7 +96,7 @@ describe('osprey mock service v1.0', function () {
         })
     })
 
-    it('should respond with header \'foo\' being of value \'test\'', function () {
+    it('should respond with header \'foo\' being of value \'test\' - should be taken from the default value', function () {
       return popsicle.default(
         {
           method: 'GET',
@@ -109,7 +109,7 @@ describe('osprey mock service v1.0', function () {
       })
     })
 
-    it('should respond with header \'foo\' being of value \'test\'', function () {
+    it('should respond with header \'foo\' being of value \'test\'  - should be taken from the default value', function () {
       return popsicle.default(
         {
           method: 'GET',
@@ -122,7 +122,7 @@ describe('osprey mock service v1.0', function () {
       })
     })
 
-    it('should respond with header \'foo\' being of value \'bar\'', function () {
+    it('should respond with header \'foo\' being of value \'bar\' - should be taken from the example value', function () {
       return popsicle.default(
         {
           method: 'GET',
@@ -132,6 +132,19 @@ describe('osprey mock service v1.0', function () {
       .use(server(http))
       .then(function (res) {
         expect(res.headers.foo).to.equal('bar')
+      })
+    })
+
+    it('should respond with header \'foo\' being of value \'bar\' - should be taken from any of the examples value', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/headersexamples'
+        }
+      )
+      .use(server(http))
+      .then(function (res) {
+        expect(res.headers.foo).to.be.oneOf(['bar', 'foo', 'random', 'another'])
       })
     })
   })

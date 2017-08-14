@@ -57,6 +57,18 @@ baseUri: http://example.com/api
           foo:
             example: bar
 
+/headersexamples:
+  get:
+    responses:
+      200:
+        headers:
+          foo:
+            examples:
+              first: bar
+              second: foo
+              third: random
+              fourth: another
+
 /headersdefault:
   get:
     responses:

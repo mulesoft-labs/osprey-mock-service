@@ -73,6 +73,20 @@ function loadFile (filename, options) {
 }
 
 /**
+ * Returns the value of either one of the defined examples or the single example.
+ *
+ * @param {Object} header
+ */
+function getExampleValueFromHeader (header) {
+  if (header.examples) {
+    var randomIndex = Math.floor(Math.random() * header.examples.length)
+    return header.examples[randomIndex].value
+  } else {
+    return header.example
+  }
+}
+
+/**
  * Create a RAML example method handler.
  *
  * @param  {Object}   method
@@ -88,8 +102,9 @@ function handler (method) {
   // Set up the default response headers.
   if (Array.isArray(response.headers)) {
     response.headers.forEach(function (header) {
-      if (header && (header.example || header.default)) {
-        headers[header.name] = header.default || header.example
+      if (header && (header.default || header.example || header.examples)) {
+        var example = getExampleValueFromHeader(header)
+        headers[header.name] = header.default || example
       }
     })
   }
