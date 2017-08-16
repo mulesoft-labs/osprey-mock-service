@@ -73,17 +73,13 @@ function loadFile (filename, options) {
 }
 
 /**
- * Returns the value of either one of the defined examples or the single example.
+ * Returns a random example from an array of examples.
  *
- * @param {Object} header
+ * @param {Array} examples
  */
-function getExampleValueFromHeader (header) {
-  if (header.examples) {
-    var randomIndex = Math.floor(Math.random() * header.examples.length)
-    return header.examples[randomIndex].value
-  } else {
-    return header.example
-  }
+function getRandomExample (examples) {
+  var randomIndex = Math.floor(Math.random() * examples.length)
+  return examples[randomIndex].value
 }
 
 /**
@@ -100,11 +96,16 @@ function handler (method) {
   var types = Object.keys(bodies)
 
   // Set up the default response headers.
-  if (Array.isArray(response.headers)) {
+  if (response.headers) {
     response.headers.forEach(function (header) {
-      if (header && (header.default || header.example || header.examples)) {
-        var example = getExampleValueFromHeader(header)
-        headers[header.name] = header.default || example
+      if (header) {
+        if (header.default) {
+          headers[header.name] = header.default
+        } else if (header.example) {
+          headers[header.name] = header.example
+        } else if (header.examples) {
+          headers[header.name] = getRandomExample(header.examples)
+        }
       }
     })
   }
