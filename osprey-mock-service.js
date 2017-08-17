@@ -73,11 +73,11 @@ function loadFile (filename, options) {
 }
 
 /**
- * Returns a random example from either one of the defined examples or the single example.
+ * Returns either a random example from examples or the single example.
  *
  * @param {Object} obj
  */
-function getRandomExampleFromObject (obj) {
+function getSingleExample (obj) {
   if (obj.examples) {
     var randomIndex = Math.floor(Math.random() * obj.examples.length)
     return obj.examples[randomIndex].value
@@ -106,7 +106,7 @@ function handler (method) {
         if (header.default) {
           headers[header.name] = header.default
         } else if (header.example || header.examples) {
-          var example = getRandomExampleFromObject(header)
+          var example = getSingleExample(header)
 
           if (example) {
             headers[header.name] = example
