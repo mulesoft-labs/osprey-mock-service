@@ -102,15 +102,13 @@ function handler (method) {
   // Set up the default response headers.
   if (response.headers) {
     response.headers.forEach(function (header) {
-      if (header) {
-        if (header.default) {
-          headers[header.name] = header.default
-        } else if (header.example || header.examples) {
-          var example = getSingleExample(header)
+      if (header.default) {
+        headers[header.name] = header.default
+      } else if (header.example || header.examples) {
+        var example = getSingleExample(header)
 
-          if (example) {
-            headers[header.name] = example
-          }
+        if (example) {
+          headers[header.name] = example
         }
       }
     })
