@@ -106,10 +106,7 @@ function handler (method) {
         headers[header.name] = header.default
       } else if (header.example || header.examples) {
         var example = getSingleExample(header)
-
-        if (example) {
-          headers[header.name] = example
-        }
+        headers[header.name] = example
       }
     })
   }
