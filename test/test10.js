@@ -41,6 +41,21 @@ describe('osprey mock service v1.0', function () {
       })
     })
 
+    it('should respond with example header', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/header2'
+        }
+      )
+      .use(server(http))
+      .then(function (res) {
+        expect(res.headers.location).to.equal('/test')
+        expect(JSON.parse(res.body)).to.deep.equal({success: true})
+        expect(res.status).to.equal(200)
+      })
+    })
+
     it('should respond with nested example parameter', function () {
       return popsicle.default(
         {
