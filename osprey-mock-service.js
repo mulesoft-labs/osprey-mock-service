@@ -90,6 +90,8 @@ function handler (method) {
     var value = headers[key]
     if (value && value.default) {
       headers[key] = value.default
+    } else if (value && value.example) {
+      headers[key] = value.example
     }
   })
 
