@@ -55,6 +55,20 @@ describe('osprey mock service v1.0', function () {
       })
     })
 
+    it('should respond with a boolean body', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/boolean'
+        }
+      )
+      .use(server(http))
+      .then(function (res) {
+        expect(JSON.parse(res.body)).to.equal(true)
+        expect(res.status).to.equal(200)
+      })
+    })
+
     it('should respond with multiple examples', function () {
       return popsicle.default(
         {

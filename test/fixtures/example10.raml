@@ -24,6 +24,15 @@ baseUri: http://example.com/api
               nested:
                 success: true
 
+/boolean:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            type: boolean
+            example: true
+
 /examples:
   get:
     responses:
