@@ -13,7 +13,9 @@ describe('osprey mock service v1.0', function () {
 
   beforeEach(function () {
     this.timeout(3000)
-    return mockService.loadFile(path.join(__dirname, '/fixtures/example10.raml'), { server: { cors: true, compression: true } })
+    return mockService.loadFile(path.join(__dirname, '/fixtures/example10.raml'), {
+      server: { cors: true, compression: true }, definition: 'http://example.com/api.raml'
+    })
       .then(function (raml) {
         http = httpes.createServer(function (req, res) {
           return raml(req, res, finalhandler(req, res))
@@ -145,6 +147,19 @@ describe('osprey mock service v1.0', function () {
       .use(server(http))
       .then(function (res) {
         expect(res.headers.foo).to.be.oneOf(['bar', 'foo', 'random', 'another'])
+      })
+    })
+
+    it('should return a link to the raml definition', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/resources'
+        }
+      )
+      .use(server(http))
+      .then(function (res) {
+        expect(res.body).to.equal('< link:"http://example.com/api.raml" rel="describedby" type="application/raml+yaml">')
       })
     })
   })

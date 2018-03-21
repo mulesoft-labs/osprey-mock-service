@@ -48,6 +48,14 @@ function createServerFromBaseUri (raml, options) {
   var app = osprey.Router()
   var path = (raml.baseUri || '').replace(/^(\w+:)?\/\/[^/]+/, '') || '/'
 
+  if (options.definition) {
+    app.use('/resources', function (req, res) {
+      var body = '< link:"' +
+        options.definition +
+        '" rel="describedby" type="application/raml+yaml">'
+      res.end(body)
+    })
+  }
   app.use(path, raml.baseUriParameters, createServer(raml, options))
 
   return app
