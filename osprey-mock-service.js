@@ -109,7 +109,8 @@ function handler (method) {
 
   // Set up the default response headers.
   if (response.headers) {
-    response.headers.forEach(function (header) {
+    Object.keys(response.headers).forEach(function (headerName) {
+      var header = response.headers[headerName]
       if (header.default) {
         headers[header.name] = header.default
       } else if (header.example || header.examples) {
