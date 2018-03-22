@@ -147,5 +147,32 @@ describe('osprey mock service v1.0', function () {
         expect(res.headers.foo).to.be.oneOf(['bar', 'foo', 'random', 'another'])
       })
     })
+
+    it('should respect mediaTypeExtensions', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/extension.xml'
+        }
+      )
+      .use(server(http))
+      .then(function (res) {
+        expect(res.body).to.contain('<resource>', '<stringProperty>', '<numberProperty>')
+      })
+    })
+
+    it('should respect mediaTypeExtensions', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/extension.json'
+        }
+      )
+      .use(server(http))
+      .then(function (res) {
+        expect(JSON.parse(res.body))
+          .to.deep.equal({stringProperty: 'foo', numberProperty: 23})
+      })
+    })
   })
 })
