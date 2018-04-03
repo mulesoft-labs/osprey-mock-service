@@ -115,8 +115,9 @@ function handler (method) {
   return function (req, res) {
     var negotiator = new Negotiator(req)
     var type = negotiator.mediaType(types)
-    if (req.params && req.params.mediaTypeExtension) {
-      var ext = req.params.mediaTypeExtension.slice(1)
+    if (req.params && (req.params.mediaTypeExtension || req.params.ext)) {
+      var ext = req.params.mediaTypeExtension || req.params.ext
+      ext = ext.slice(1)
       type = 'application/' + ext
     }
     var body = bodies[type] || {}

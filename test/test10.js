@@ -152,7 +152,7 @@ describe('osprey mock service v1.0', function () {
       return popsicle.default(
         {
           method: 'GET',
-          url: '/api/extension.xml'
+          url: '/api/mediatypeextension.xml'
         }
       )
       .use(server(http))
@@ -161,11 +161,11 @@ describe('osprey mock service v1.0', function () {
       })
     })
 
-    it('should respect mediaTypeExtensions', function () {
+    it('should respect ext', function () {
       return popsicle.default(
         {
           method: 'GET',
-          url: '/api/extension.json'
+          url: '/api/ext.json'
         }
       )
       .use(server(http))

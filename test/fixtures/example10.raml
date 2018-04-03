@@ -79,7 +79,19 @@ baseUri: http://example.com/api
             default: test
 
 
-/extension{mediaTypeExtension}:
+/mediatypeextension{mediaTypeExtension}:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              stringProperty: foo
+              numberProperty: 23
+          application/xml:
+            example: !include ./example.xml
+
+/ext{ext}:
   get:
     responses:
       200:
