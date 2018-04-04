@@ -137,7 +137,7 @@ function handler (method) {
       }
 
       if (example) {
-        res.write(typeof example === 'object' ? JSON.stringify(example) : example)
+        res.write(typeof example !== 'string' ? JSON.stringify(example) : example)
       }
     }
 
