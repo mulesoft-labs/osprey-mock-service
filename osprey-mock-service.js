@@ -61,6 +61,7 @@ function createServerFromBaseUri (raml, options) {
  * @return {Function}
  */
 function loadFile (filename, options) {
+  options = options || {}
   return require('raml-1-parser')
     .loadRAML(filename, { rejectOnErrors: true })
     .then(function (ramlApi) {
