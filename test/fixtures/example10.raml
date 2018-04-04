@@ -1,6 +1,7 @@
 #%RAML 1.0
 title: Example API
 baseUri: http://example.com/api
+mediaType: application/json
 
 /test:
   get:
@@ -86,3 +87,11 @@ baseUri: http://example.com/api
         headers:
           foo:
             default: test
+/defaultmediatype:
+  get:
+    responses:
+      200:
+        body:
+          example:
+            stringProperty: foo
+            numberProperty: 23
