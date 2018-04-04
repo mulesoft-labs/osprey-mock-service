@@ -73,6 +73,20 @@ function loadFile (filename, options) {
 }
 
 /**
+ * Returns either a random example from examples or the single example.
+ *
+ * @param {Object} obj
+ */
+function getSingleExample (obj) {
+  if (obj.examples) {
+    var randomIndex = Math.floor(Math.random() * obj.examples.length)
+    return obj.examples[randomIndex].value
+  } else {
+    return obj.example
+  }
+}
+
+/**
  * Create a RAML example method handler.
  *
  * @param  {Object}   method
@@ -82,16 +96,21 @@ function handler (method) {
   var statusCode = getStatusCode(method)
   var response = (method.responses || {})[statusCode] || {}
   var bodies = response.body || {}
-  var headers = response.headers || method.headers || {}
+  var headers = {}
   var types = Object.keys(bodies)
 
   // Set up the default response headers.
-  Object.keys(headers).forEach(function (key) {
-    var value = headers[key]
-    if (value && value.default) {
-      headers[key] = value.default
-    }
-  })
+  if (response.headers) {
+    Object.keys(response.headers).forEach(function (headerName) {
+      var header = response.headers[headerName]
+      if (header.default) {
+        headers[header.name] = header.default
+      } else if (header.example || header.examples) {
+        var example = getSingleExample(header)
+        headers[header.name] = example
+      }
+    })
+  }
 
   return function (req, res) {
     var negotiator = new Negotiator(req)

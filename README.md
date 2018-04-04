@@ -20,13 +20,14 @@ npm install -g osprey-mock-service
 Start the service from the CLI. This will automatically use the `baseUri` as the path to the mock service. For example, `http://example.com/api` will result in `http://localhost:{PORT}/api`.
 
 ```
-osprey-mock-service -f api.raml -p 3000
+osprey-mock-service -f api.raml -p 3000 --cors
 ```
 
 **Options**
 
 * `-f` Path to the root RAML definition (E.g. `/path/to/api.raml`)
 * `-p` Port number to bind the server locally
+* `--cors` Enable CORS with the API
 
 ### Locally (JavaScript)
 

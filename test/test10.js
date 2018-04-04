@@ -33,12 +33,11 @@ describe('osprey mock service v1.0', function () {
           url: '/api/test'
         }
       )
-        .use(server(http))
-        .then(function (res) {
-          expect(res.headers.location).to.equal('/test')
-          expect(JSON.parse(res.body)).to.deep.equal({success: true})
-          expect(res.status).to.equal(200)
-        })
+      .use(server(http))
+      .then(function (res) {
+        expect(JSON.parse(res.body)).to.deep.equal({success: true})
+        expect(res.status).to.equal(200)
+      })
     })
 
     it('should respond with nested example parameter', function () {
@@ -95,6 +94,58 @@ describe('osprey mock service v1.0', function () {
           expect(res.status).to.equal(200)
           expect(res.body).to.equal('')
         })
+    })
+
+    it('should return a header \'foo\' equal to the \'default\' value \'test\' instead of the \'example\' value', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/headersdefaultbeforeexample'
+        }
+      )
+      .use(server(http))
+      .then(function (res) {
+        expect(res.headers.foo).to.equal('test')
+      })
+    })
+
+    it('should return a header \'foo\' equal to the \'default\' value \'test\'', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/headersdefault'
+        }
+      )
+      .use(server(http))
+      .then(function (res) {
+        expect(res.headers.foo).to.equal('test')
+      })
+    })
+
+    it('should return a header \'foo\' equal to the \'example\' value \'bar\'', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/headersexample'
+        }
+      )
+      .use(server(http))
+      .then(function (res) {
+        expect(res.headers.foo).to.equal('bar')
+      })
+    })
+
+    it('should return a header \'foo\' equal to any of the \'examples\' value defined', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/headersexamples'
+        }
+      )
+      .use(server(http))
+      .then(function (res) {
+        expect(res.headers.foo).to.be.oneOf(['bar', 'foo', 'random', 'another'])
+      })
     })
   })
 })
