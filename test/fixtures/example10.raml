@@ -87,6 +87,7 @@ mediaType: application/json
         headers:
           foo:
             default: test
+
 /defaultmediatype:
   get:
     responses:
@@ -95,3 +96,28 @@ mediaType: application/json
           example:
             stringProperty: foo
             numberProperty: 23
+
+/mediatypeextension{mediaTypeExtension}:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              stringProperty: foo
+              numberProperty: 23
+          application/xml:
+            example: !include ./example.xml
+
+/ext{ext}:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              stringProperty: foo
+              numberProperty: 23
+          application/xml:
+            example: !include ./example.xml
+
