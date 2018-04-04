@@ -38,6 +38,6 @@ mock.loadFile(argv.f, options)
     })
   })
   .catch(function (err) {
-    console.log(err && err.stack || err.message)
+    console.log(err && (err.stack || err.message))
     process.exit(1)
   })
