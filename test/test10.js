@@ -61,11 +61,11 @@ describe('osprey mock service v1.0', function () {
           url: '/api/boolean'
         }
       )
-      .use(server(http))
-      .then(function (res) {
-        expect(JSON.parse(res.body)).to.equal(true)
-        expect(res.status).to.equal(200)
-      })
+        .use(server(http))
+        .then(function (res) {
+          expect(JSON.parse(res.body)).to.equal(true)
+          expect(res.status).to.equal(200)
+        })
     })
 
     it('should respond with multiple examples', function () {
@@ -169,11 +169,11 @@ describe('osprey mock service v1.0', function () {
           url: '/api/defaultmediatype'
         }
       )
-      .use(server(http))
-      .then(function (res) {
-        expect(JSON.parse(res.body))
-        .to.deep.equal({stringProperty: 'foo', numberProperty: 23})
-      })
+        .use(server(http))
+        .then(function (res) {
+          expect(JSON.parse(res.body))
+            .to.deep.equal({stringProperty: 'foo', numberProperty: 23})
+        })
     })
 
     it('should respect mediaTypeExtensions', function () {
@@ -183,10 +183,10 @@ describe('osprey mock service v1.0', function () {
           url: '/api/mediatypeextension.xml'
         }
       )
-      .use(server(http))
-      .then(function (res) {
-        expect(res.body).to.contain('<resource>', '<stringProperty>', '<numberProperty>')
-      })
+        .use(server(http))
+        .then(function (res) {
+          expect(res.body).to.contain('<resource>', '<stringProperty>', '<numberProperty>')
+        })
     })
 
     it('should respect ext', function () {
@@ -196,11 +196,11 @@ describe('osprey mock service v1.0', function () {
           url: '/api/ext.json'
         }
       )
-      .use(server(http))
-      .then(function (res) {
-        expect(JSON.parse(res.body))
-          .to.deep.equal({stringProperty: 'foo', numberProperty: 23})
-      })
+        .use(server(http))
+        .then(function (res) {
+          expect(JSON.parse(res.body))
+            .to.deep.equal({stringProperty: 'foo', numberProperty: 23})
+        })
     })
   })
 })

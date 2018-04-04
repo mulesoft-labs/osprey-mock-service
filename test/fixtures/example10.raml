@@ -88,6 +88,15 @@ mediaType: application/json
           foo:
             default: test
 
+/defaultmediatype:
+  get:
+    responses:
+      200:
+        body:
+          example:
+            stringProperty: foo
+            numberProperty: 23
+
 /mediatypeextension{mediaTypeExtension}:
   get:
     responses:
