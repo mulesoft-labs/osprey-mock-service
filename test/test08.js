@@ -48,7 +48,7 @@ describe('osprey mock service v0.8', function () {
         .use(server(http))
         .then(function (res) {
           expect(res.status).to.equal(200)
-          expect(res.body).to.be.empty
+          expect(res.body).to.equal('')
         })
     })
   })
