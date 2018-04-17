@@ -2,6 +2,17 @@
 title: Example API
 baseUri: http://example.com/api
 
+types:
+  User:
+    type: object
+    properties:
+      name:
+        type: string
+        example: Kendrick
+      lastname:
+        type: string
+        example: Lamar
+
 /test:
   get:
     responses:
@@ -77,3 +88,19 @@ baseUri: http://example.com/api
         headers:
           foo:
             default: test
+/user:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            type: User
+/users:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              fee: fi
+              fo: fum

@@ -117,6 +117,14 @@ function handler (method) {
     var type = negotiator.mediaType(types)
     var body = bodies[type]
 
+    if (body && body.properties) {
+      var propertiesExample = Object.keys(body.properties).reduce(function (example, property) {
+        if (body.properties[property].example) {
+          example[property] = body.properties[property].example
+        }
+        return example
+      }, {})
+    }
     res.statusCode = statusCode
     setHeaders(res, headers)
 
@@ -137,6 +145,10 @@ function handler (method) {
 
       if (example) {
         res.write(typeof example === 'object' ? JSON.stringify(example) : example)
+      }
+
+      if (propertiesExample) {
+        res.write(typeof propertiesExample === 'object' ? JSON.stringify(propertiesExample) : propertiesExample)
       }
     }
 

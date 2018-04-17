@@ -147,5 +147,18 @@ describe('osprey mock service v1.0', function () {
         expect(res.headers.foo).to.be.oneOf(['bar', 'foo', 'random', 'another'])
       })
     })
+
+    it('should return property-level examples from type.', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/user'
+        }
+      )
+      .use(server(http))
+      .then(function (res) {
+        expect(JSON.parse(res.body).name).to.equal('Kendrick')
+      })
+    })
   })
 })
