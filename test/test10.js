@@ -75,12 +75,12 @@ describe('osprey mock service v1.0', function () {
           url: '/api/examples'
         }
       )
-      .use(server(http))
-      .then(function (res) {
-        var match = /example./.test(JSON.parse(res.body).name)
-        expect(match).to.equal(true)
-        expect(res.status).to.equal(200)
-      })
+        .use(server(http))
+        .then(function (res) {
+          var match = /example./.test(JSON.parse(res.body).name)
+          expect(match).to.equal(true)
+          expect(res.status).to.equal(200)
+        })
     })
 
     it('should reject undefined route', function () {
@@ -200,10 +200,10 @@ describe('osprey mock service v1.0', function () {
           url: '/api/user'
         }
       )
-      .use(server(http))
-      .then(function (res) {
-        expect(JSON.parse(res.body).name).to.equal('Kendrick')
-      })
+        .use(server(http))
+        .then(function (res) {
+          expect(JSON.parse(res.body).name).to.equal('Kendrick')
+        })
     })
   })
 })
