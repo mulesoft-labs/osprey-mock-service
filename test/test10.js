@@ -63,18 +63,8 @@ describe('osprey mock service v1.0', function () {
       )
       .use(server(http))
       .then(function (res) {
-        expect(JSON.parse(res.body)).to.deep.equal([
-          {
-            example1: {
-              name: 'example1'
-            }
-          },
-          {
-            example2: {
-              name: 'example2'
-            }
-          }
-        ])
+        var match = /example./.test(JSON.parse(res.body).name)
+        expect(match).to.equal(true)
         expect(res.status).to.equal(200)
       })
     })

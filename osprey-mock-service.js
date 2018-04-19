@@ -135,12 +135,10 @@ function handler (method) {
       // Parse body.examples.
       if (Array.isArray(body.examples)) {
         example = []
-
         body.examples.forEach(function (ex) {
-          var obj = {}
-          obj[ex.name] = ex.structuredValue
-          example.push(obj)
+          example.push(ex.structuredValue)
         })
+        example = example[Math.floor(Math.random() * example.length)]
       }
 
       if (example) {
