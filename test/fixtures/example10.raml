@@ -1,6 +1,7 @@
 #%RAML 1.0
 title: Example API
 baseUri: http://example.com/api
+mediaType: application/json
 
 types:
   User:
@@ -32,6 +33,15 @@ types:
             example:
               nested:
                 success: true
+
+/boolean:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            type: boolean
+            example: true
 
 /examples:
   get:
@@ -88,6 +98,40 @@ types:
         headers:
           foo:
             default: test
+
+/defaultmediatype:
+  get:
+    responses:
+      200:
+        body:
+          example:
+            stringProperty: foo
+            numberProperty: 23
+
+/mediatypeextension{mediaTypeExtension}:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              stringProperty: foo
+              numberProperty: 23
+          application/xml:
+            example: !include ./example.xml
+
+/ext{ext}:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              stringProperty: foo
+              numberProperty: 23
+          application/xml:
+            example: !include ./example.xml
+
 /user:
   get:
     responses:
@@ -95,4 +139,3 @@ types:
         body:
           application/json:
             type: User
-

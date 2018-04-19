@@ -1,0 +1,4 @@
+<resource>
+  <stringProperty>foo</stringProperty>
+  <numberProperty>23</numberProperty>
+</resource>

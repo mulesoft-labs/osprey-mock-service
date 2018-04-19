@@ -61,6 +61,7 @@ function createServerFromBaseUri (raml, options) {
  * @return {Function}
  */
 function loadFile (filename, options) {
+  options = options || {}
   return require('raml-1-parser')
     .loadRAML(filename, { rejectOnErrors: true })
     .then(function (ramlApi) {
@@ -115,7 +116,12 @@ function handler (method) {
   return function (req, res) {
     var negotiator = new Negotiator(req)
     var type = negotiator.mediaType(types)
-    var body = bodies[type]
+    if (req.params && (req.params.mediaTypeExtension || req.params.ext)) {
+      var ext = req.params.mediaTypeExtension || req.params.ext
+      ext = ext.slice(1)
+      type = 'application/' + ext
+    }
+    var body = bodies[type] || {}
 
     if (body && body.properties) {
       var propertiesExample = Object.keys(body.properties).reduce(function (example, property) {
@@ -142,7 +148,7 @@ function handler (method) {
       }
 
       if (example) {
-        res.write(typeof example === 'object' ? JSON.stringify(example) : example)
+        res.write(typeof example !== 'string' ? JSON.stringify(example) : example)
       }
 
       if (propertiesExample) {

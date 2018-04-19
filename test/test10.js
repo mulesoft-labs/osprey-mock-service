@@ -33,11 +33,11 @@ describe('osprey mock service v1.0', function () {
           url: '/api/test'
         }
       )
-      .use(server(http))
-      .then(function (res) {
-        expect(JSON.parse(res.body)).to.deep.equal({success: true})
-        expect(res.status).to.equal(200)
-      })
+        .use(server(http))
+        .then(function (res) {
+          expect(JSON.parse(res.body)).to.deep.equal({success: true})
+          expect(res.status).to.equal(200)
+        })
     })
 
     it('should respond with nested example parameter', function () {
@@ -47,11 +47,25 @@ describe('osprey mock service v1.0', function () {
           url: '/api/nested'
         }
       )
-      .use(server(http))
-      .then(function (res) {
-        expect(JSON.parse(res.body)).to.deep.equal({nested: {success: true}})
-        expect(res.status).to.equal(200)
-      })
+        .use(server(http))
+        .then(function (res) {
+          expect(JSON.parse(res.body)).to.deep.equal({nested: {success: true}})
+          expect(res.status).to.equal(200)
+        })
+    })
+
+    it('should respond with a boolean body', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/boolean'
+        }
+      )
+        .use(server(http))
+        .then(function (res) {
+          expect(JSON.parse(res.body)).to.equal(true)
+          expect(res.status).to.equal(200)
+        })
     })
 
     it('should respond with multiple examples', function () {
@@ -82,7 +96,7 @@ describe('osprey mock service v1.0', function () {
         .use(server(http))
         .then(function (res) {
           expect(res.status).to.equal(200)
-          expect(res.body).to.be.empty
+          expect(res.body).to.equal('')
         })
     })
 
@@ -93,10 +107,10 @@ describe('osprey mock service v1.0', function () {
           url: '/api/headersdefaultbeforeexample'
         }
       )
-      .use(server(http))
-      .then(function (res) {
-        expect(res.headers.foo).to.equal('test')
-      })
+        .use(server(http))
+        .then(function (res) {
+          expect(res.headers.foo).to.equal('test')
+        })
     })
 
     it('should return a header \'foo\' equal to the \'default\' value \'test\'', function () {
@@ -106,10 +120,10 @@ describe('osprey mock service v1.0', function () {
           url: '/api/headersdefault'
         }
       )
-      .use(server(http))
-      .then(function (res) {
-        expect(res.headers.foo).to.equal('test')
-      })
+        .use(server(http))
+        .then(function (res) {
+          expect(res.headers.foo).to.equal('test')
+        })
     })
 
     it('should return a header \'foo\' equal to the \'example\' value \'bar\'', function () {
@@ -119,10 +133,10 @@ describe('osprey mock service v1.0', function () {
           url: '/api/headersexample'
         }
       )
-      .use(server(http))
-      .then(function (res) {
-        expect(res.headers.foo).to.equal('bar')
-      })
+        .use(server(http))
+        .then(function (res) {
+          expect(res.headers.foo).to.equal('bar')
+        })
     })
 
     it('should return a header \'foo\' equal to any of the \'examples\' value defined', function () {
@@ -132,10 +146,51 @@ describe('osprey mock service v1.0', function () {
           url: '/api/headersexamples'
         }
       )
-      .use(server(http))
-      .then(function (res) {
-        expect(res.headers.foo).to.be.oneOf(['bar', 'foo', 'random', 'another'])
-      })
+        .use(server(http))
+        .then(function (res) {
+          expect(res.headers.foo).to.be.oneOf(['bar', 'foo', 'random', 'another'])
+        })
+    })
+
+    it('should default to document\'s mediatype', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/defaultmediatype'
+        }
+      )
+        .use(server(http))
+        .then(function (res) {
+          expect(JSON.parse(res.body))
+            .to.deep.equal({stringProperty: 'foo', numberProperty: 23})
+        })
+    })
+
+    it('should respect mediaTypeExtensions', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/mediatypeextension.xml'
+        }
+      )
+        .use(server(http))
+        .then(function (res) {
+          expect(res.body).to.contain('<resource>', '<stringProperty>', '<numberProperty>')
+        })
+    })
+
+    it('should respect ext', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/ext.json'
+        }
+      )
+        .use(server(http))
+        .then(function (res) {
+          expect(JSON.parse(res.body))
+            .to.deep.equal({stringProperty: 'foo', numberProperty: 23})
+        })
     })
 
     it('should return property-level examples from type.', function () {
