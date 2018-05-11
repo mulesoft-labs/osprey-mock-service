@@ -13,6 +13,22 @@ types:
       lastname:
         type: string
         example: Lamar
+      age:
+        type: number
+        example: 10
+      good:
+        type: boolean
+        example: true
+      array:
+        type: array
+        example:
+          - foo
+          - bar
+      object:
+        type: object
+        example:
+          foo: 1
+          bar: 2
 
 /test:
   get:
@@ -107,18 +123,6 @@ types:
           example:
             stringProperty: foo
             numberProperty: 23
-
-/mediatypeextension{mediaTypeExtension}:
-  get:
-    responses:
-      200:
-        body:
-          application/json:
-            example:
-              stringProperty: foo
-              numberProperty: 23
-          application/xml:
-            example: !include ./example.xml
 
 /ext{ext}:
   get:

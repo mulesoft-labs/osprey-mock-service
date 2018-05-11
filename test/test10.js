@@ -166,19 +166,6 @@ describe('osprey mock service v1.0', function () {
         })
     })
 
-    it('should respect mediaTypeExtensions', function () {
-      return popsicle.default(
-        {
-          method: 'GET',
-          url: '/api/mediatypeextension.xml'
-        }
-      )
-        .use(server(http))
-        .then(function (res) {
-          expect(res.body).to.contain('<resource>', '<stringProperty>', '<numberProperty>')
-        })
-    })
-
     it('should respect ext', function () {
       return popsicle.default(
         {
@@ -203,6 +190,11 @@ describe('osprey mock service v1.0', function () {
         .use(server(http))
         .then(function (res) {
           expect(JSON.parse(res.body).name).to.equal('Kendrick')
+          expect(JSON.parse(res.body).lastname).to.equal('Lamar')
+          expect(JSON.parse(res.body).age).to.equal(10)
+          expect(JSON.parse(res.body).good).to.equal(true)
+          expect(JSON.parse(res.body).array).to.eql(['foo', 'bar'])
+          expect(JSON.parse(res.body).object).to.eql({'foo': 1, 'bar': 2})
         })
     })
   })

@@ -19,3 +19,16 @@ baseUri: http://example.com/api
       200:
         body:
           application/json:
+
+/mediatypeextension{mediaTypeExtension}:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "foo": "bar"
+              }
+          application/xml:
+            example: !include ./example.xml
