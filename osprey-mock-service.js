@@ -138,19 +138,21 @@ function handler (method) {
       res.setHeader('Content-Type', type)
       var example = body.example
 
-      // Parse body.examples.
+      // Parse body.examples
       if (Array.isArray(body.examples)) {
         body.examples = body.examples.map(function (ex) {
-          return ex.structuredValue
+          if (ex.structuredValue) {
+            return ex.structuredValue
+          } else {
+            return ex
+          }
         })
         example = getSingleExample(body)
       }
 
       if (example) {
         res.write(typeof example !== 'string' ? JSON.stringify(example) : example)
-      }
-
-      if (propertiesExample) {
+      } else if (propertiesExample) {
         res.write(typeof propertiesExample === 'object' ? JSON.stringify(propertiesExample) : propertiesExample)
       }
     }

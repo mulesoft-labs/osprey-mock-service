@@ -83,6 +83,24 @@ describe('osprey mock service v1.0', function () {
         })
     })
 
+    it('should respond to consecutive requests', function () {
+      var req = {
+        method: 'GET',
+        url: '/api/examples'
+      }
+      return popsicle.default(req)
+        .use(server(http))
+        .then(function (res) {
+          popsicle.default(req)
+            .use(server(http))
+            .then(function (res) {
+              var match = /example./.test(JSON.parse(res.body).name)
+              expect(match).to.equal(true)
+              expect(res.status).to.equal(200)
+            })
+        })
+    })
+
     it('should reject undefined route', function () {
       return popsicle.default('/api/unknown')
         .use(server(http))
