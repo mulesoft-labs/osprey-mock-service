@@ -3,6 +3,33 @@ title: Example API
 baseUri: http://example.com/api
 mediaType: application/json
 
+types:
+  User:
+    type: object
+    properties:
+      name:
+        type: string
+        example: Kendrick
+      lastname:
+        type: string
+        example: Lamar
+      age:
+        type: number
+        example: 10
+      good:
+        type: boolean
+        example: true
+      array:
+        type: array
+        example:
+          - foo
+          - bar
+      object:
+        type: object
+        example:
+          foo: 1
+          bar: 2
+
 /test:
   get:
     responses:
@@ -97,18 +124,6 @@ mediaType: application/json
             stringProperty: foo
             numberProperty: 23
 
-/mediatypeextension{mediaTypeExtension}:
-  get:
-    responses:
-      200:
-        body:
-          application/json:
-            example:
-              stringProperty: foo
-              numberProperty: 23
-          application/xml:
-            example: !include ./example.xml
-
 /ext{ext}:
   get:
     responses:
@@ -121,3 +136,10 @@ mediaType: application/json
           application/xml:
             example: !include ./example.xml
 
+/user:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            type: User

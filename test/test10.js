@@ -77,19 +77,27 @@ describe('osprey mock service v1.0', function () {
       )
         .use(server(http))
         .then(function (res) {
-          expect(JSON.parse(res.body)).to.deep.equal([
-            {
-              example1: {
-                name: 'example1'
-              }
-            },
-            {
-              example2: {
-                name: 'example2'
-              }
-            }
-          ])
+          var match = /example./.test(JSON.parse(res.body).name)
+          expect(match).to.equal(true)
           expect(res.status).to.equal(200)
+        })
+    })
+
+    it('should respond to consecutive requests', function () {
+      var req = {
+        method: 'GET',
+        url: '/api/examples'
+      }
+      return popsicle.default(req)
+        .use(server(http))
+        .then(function (res) {
+          popsicle.default(req)
+            .use(server(http))
+            .then(function (res) {
+              var match = /example./.test(JSON.parse(res.body).name)
+              expect(match).to.equal(true)
+              expect(res.status).to.equal(200)
+            })
         })
     })
 
@@ -176,19 +184,6 @@ describe('osprey mock service v1.0', function () {
         })
     })
 
-    it('should respect mediaTypeExtensions', function () {
-      return popsicle.default(
-        {
-          method: 'GET',
-          url: '/api/mediatypeextension.xml'
-        }
-      )
-        .use(server(http))
-        .then(function (res) {
-          expect(res.body).to.contain('<resource>', '<stringProperty>', '<numberProperty>')
-        })
-    })
-
     it('should respect ext', function () {
       return popsicle.default(
         {
@@ -200,6 +195,24 @@ describe('osprey mock service v1.0', function () {
         .then(function (res) {
           expect(JSON.parse(res.body))
             .to.deep.equal({stringProperty: 'foo', numberProperty: 23})
+        })
+    })
+
+    it('should return property-level examples from type.', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/user'
+        }
+      )
+        .use(server(http))
+        .then(function (res) {
+          expect(JSON.parse(res.body).name).to.equal('Kendrick')
+          expect(JSON.parse(res.body).lastname).to.equal('Lamar')
+          expect(JSON.parse(res.body).age).to.equal(10)
+          expect(JSON.parse(res.body).good).to.equal(true)
+          expect(JSON.parse(res.body).array).to.eql(['foo', 'bar'])
+          expect(JSON.parse(res.body).object).to.eql({'foo': 1, 'bar': 2})
         })
     })
   })

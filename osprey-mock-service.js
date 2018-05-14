@@ -81,7 +81,7 @@ function loadFile (filename, options) {
 function getSingleExample (obj) {
   if (obj.examples) {
     var randomIndex = Math.floor(Math.random() * obj.examples.length)
-    return obj.examples[randomIndex].value
+    return obj.examples[randomIndex].value || obj.examples[randomIndex]
   } else {
     return obj.example
   }
@@ -123,6 +123,14 @@ function handler (method) {
     }
     var body = bodies[type] || {}
 
+    if (body && body.properties) {
+      var propertiesExample = Object.keys(body.properties).reduce(function (example, property) {
+        if (body.properties[property].example) {
+          example[property] = body.properties[property].example
+        }
+        return example
+      }, {})
+    }
     res.statusCode = statusCode
     setHeaders(res, headers)
 
@@ -130,19 +138,22 @@ function handler (method) {
       res.setHeader('Content-Type', type)
       var example = body.example
 
-      // Parse body.examples.
+      // Parse body.examples
       if (Array.isArray(body.examples)) {
-        example = []
-
-        body.examples.forEach(function (ex) {
-          var obj = {}
-          obj[ex.name] = ex.structuredValue
-          example.push(obj)
+        body.examples = body.examples.map(function (ex) {
+          if (ex.structuredValue) {
+            return ex.structuredValue
+          } else {
+            return ex
+          }
         })
+        example = getSingleExample(body)
       }
 
       if (example) {
         res.write(typeof example !== 'string' ? JSON.stringify(example) : example)
+      } else if (propertiesExample) {
+        res.write(typeof propertiesExample === 'object' ? JSON.stringify(propertiesExample) : propertiesExample)
       }
     }
 

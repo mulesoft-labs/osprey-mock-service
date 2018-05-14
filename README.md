@@ -62,11 +62,6 @@ parser.loadRAML(path.join(__dirname, 'api.raml'), { rejectOnErrors: true })
 * `createServerFromBaseUri` Creates a mock service with Osprey and uses the base URI path
 * `loadFile` Creates a mock service with Osprey and the base URI path from a RAML file
 
-### Limitation
-
-#### RAML 1.0
-This module only uses the `example` (or `examples`) property inside a given resource/method body. It does not take into consideration any of the `example` properties defined inside the `properties` or `schema` of the body itself.
-
 ## License
 
 Apache License 2.0

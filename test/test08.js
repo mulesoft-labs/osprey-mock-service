@@ -51,5 +51,31 @@ describe('osprey mock service v0.8', function () {
           expect(res.body).to.equal('')
         })
     })
+
+    it('should respect mediaTypeExtensions (application/json)', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/mediatypeextension.json'
+        }
+      )
+        .use(server(http))
+        .then(function (res) {
+          expect(JSON.parse(res.body)).to.deep.equal({foo: 'bar'})
+        })
+    })
+
+    it('should respect mediaTypeExtensions (application/xml)', function () {
+      return popsicle.default(
+        {
+          method: 'GET',
+          url: '/api/mediatypeextension.xml'
+        }
+      )
+        .use(server(http))
+        .then(function (res) {
+          expect(res.body).to.contain('<resource>', '<stringProperty>', '<numberProperty>')
+        })
+    })
   })
 })
