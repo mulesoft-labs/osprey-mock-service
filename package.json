@@ -48,8 +48,8 @@
     "finalhandler": "^1.1.1",
     "morgan": "^1.7.0",
     "negotiator": "^0.6.0",
-    "osprey": "^0.4.1",
-    "osprey-resources": "^0.7.1",
+    "osprey": "^0.5.0",
+    "osprey-resources": "^0.8.0",
     "raml-1-parser": "^1.1.x",
     "yargs": "^11.0.0"
   }
