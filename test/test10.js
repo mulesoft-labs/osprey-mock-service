@@ -1,4 +1,4 @@
-/* global describe, it, beforeEach */
+/* global describe, it, before */
 
 var expect = require('chai').expect
 var mockService = require('../')
@@ -11,7 +11,7 @@ var path = require('path')
 describe('osprey mock service v1.0', function () {
   var http
 
-  beforeEach(function () {
+  before(function () {
     this.timeout(3000)
     return mockService.loadFile(path.join(__dirname, '/fixtures/example10.raml'), { server: { cors: true, compression: true } })
       .then(function (raml) {
