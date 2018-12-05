@@ -35,7 +35,7 @@ describe('osprey mock service v1.0', function () {
       )
         .use(server(http))
         .then(function (res) {
-          expect(JSON.parse(res.body)).to.deep.equal({success: true})
+          expect(JSON.parse(res.body)).to.deep.equal({ success: true })
           expect(res.status).to.equal(200)
         })
     })
@@ -49,7 +49,7 @@ describe('osprey mock service v1.0', function () {
       )
         .use(server(http))
         .then(function (res) {
-          expect(JSON.parse(res.body)).to.deep.equal({nested: {success: true}})
+          expect(JSON.parse(res.body)).to.deep.equal({ nested: { success: true } })
           expect(res.status).to.equal(200)
         })
     })
@@ -180,7 +180,7 @@ describe('osprey mock service v1.0', function () {
         .use(server(http))
         .then(function (res) {
           expect(JSON.parse(res.body))
-            .to.deep.equal({stringProperty: 'foo', numberProperty: 23})
+            .to.deep.equal({ stringProperty: 'foo', numberProperty: 23 })
         })
     })
 
@@ -194,7 +194,7 @@ describe('osprey mock service v1.0', function () {
         .use(server(http))
         .then(function (res) {
           expect(JSON.parse(res.body))
-            .to.deep.equal({stringProperty: 'foo', numberProperty: 23})
+            .to.deep.equal({ stringProperty: 'foo', numberProperty: 23 })
         })
     })
 
@@ -212,7 +212,7 @@ describe('osprey mock service v1.0', function () {
           expect(JSON.parse(res.body).age).to.equal(10)
           expect(JSON.parse(res.body).good).to.equal(true)
           expect(JSON.parse(res.body).array).to.eql(['foo', 'bar'])
-          expect(JSON.parse(res.body).object).to.eql({'foo': 1, 'bar': 2})
+          expect(JSON.parse(res.body).object).to.eql({ 'foo': 1, 'bar': 2 })
         })
     })
   })
