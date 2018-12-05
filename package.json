@@ -41,7 +41,7 @@
     "mocha": "^5.0.4",
     "pre-commit": "^1.0.1",
     "standard": "^12.0.0",
-    "popsicle": "^9.2.0",
+    "popsicle": "^10.0.0",
     "popsicle-server": "^2.0.0"
   },
   "dependencies": {
