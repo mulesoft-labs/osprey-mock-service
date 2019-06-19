@@ -51,6 +51,6 @@
     "osprey": "^0.5.2",
     "osprey-resources": "^0.8.2",
     "raml-1-parser": "^1.1.52",
-    "yargs": "^13.2.2"
+    "yargs": "^13.3.0"
   }
 }
