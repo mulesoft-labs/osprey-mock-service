@@ -2,11 +2,10 @@
 
 var expect = require('chai').expect
 var mockService = require('../')
-var popsicle = require('popsicle')
-var server = require('popsicle-server')
-var finalhandler = require('finalhandler')
 var httpes = require('http')
 var path = require('path')
+var finalhandler = require('finalhandler')
+var makeFetcher = require('./utils').makeFetcher
 
 describe('osprey mock service v1.0', function () {
   var http
@@ -27,13 +26,9 @@ describe('osprey mock service v1.0', function () {
     })
 
     it('should respond with example parameter', function () {
-      return popsicle.default(
-        {
-          method: 'GET',
-          url: '/api/test'
-        }
-      )
-        .use(server(http))
+      return makeFetcher(http).fetch('/api/test', {
+        method: 'GET'
+      })
         .then(function (res) {
           expect(JSON.parse(res.body)).to.deep.equal({ success: true })
           expect(res.status).to.equal(200)
@@ -41,13 +36,9 @@ describe('osprey mock service v1.0', function () {
     })
 
     it('should respond with nested example parameter', function () {
-      return popsicle.default(
-        {
-          method: 'GET',
-          url: '/api/nested'
-        }
-      )
-        .use(server(http))
+      return makeFetcher(http).fetch('/api/nested', {
+        method: 'GET'
+      })
         .then(function (res) {
           expect(JSON.parse(res.body)).to.deep.equal({ nested: { success: true } })
           expect(res.status).to.equal(200)
@@ -55,13 +46,9 @@ describe('osprey mock service v1.0', function () {
     })
 
     it('should respond with a boolean body', function () {
-      return popsicle.default(
-        {
-          method: 'GET',
-          url: '/api/boolean'
-        }
-      )
-        .use(server(http))
+      return makeFetcher(http).fetch('/api/boolean', {
+        method: 'GET'
+      })
         .then(function (res) {
           expect(JSON.parse(res.body)).to.equal(true)
           expect(res.status).to.equal(200)
@@ -69,13 +56,9 @@ describe('osprey mock service v1.0', function () {
     })
 
     it('should respond with multiple examples', function () {
-      return popsicle.default(
-        {
-          method: 'GET',
-          url: '/api/examples'
-        }
-      )
-        .use(server(http))
+      return makeFetcher(http).fetch('/api/examples', {
+        method: 'GET'
+      })
         .then(function (res) {
           var match = /example./.test(JSON.parse(res.body).name)
           expect(match).to.equal(true)
@@ -84,15 +67,9 @@ describe('osprey mock service v1.0', function () {
     })
 
     it('should respond to consecutive requests', function () {
-      var req = {
-        method: 'GET',
-        url: '/api/examples'
-      }
-      return popsicle.default(req)
-        .use(server(http))
+      return makeFetcher(http).fetch('/api/examples', { method: 'GET' })
         .then(function (res) {
-          popsicle.default(req)
-            .use(server(http))
+          makeFetcher(http).fetch('/api/examples', { method: 'GET' })
             .then(function (res) {
               var match = /example./.test(JSON.parse(res.body).name)
               expect(match).to.equal(true)
@@ -102,16 +79,18 @@ describe('osprey mock service v1.0', function () {
     })
 
     it('should reject undefined route', function () {
-      return popsicle.default('/api/unknown')
-        .use(server(http))
+      return makeFetcher(http).fetch('/api/unknown', {
+        method: 'GET'
+      })
         .then(function (res) {
           expect(res.status).to.equal(404)
         })
     })
 
     it('should have empty body when there are no example property', function () {
-      return popsicle.default('/api/noexample')
-        .use(server(http))
+      return makeFetcher(http).fetch('/api/noexample', {
+        method: 'GET'
+      })
         .then(function (res) {
           expect(res.status).to.equal(200)
           expect(res.body).to.equal('')
@@ -119,65 +98,45 @@ describe('osprey mock service v1.0', function () {
     })
 
     it('should return a header \'foo\' equal to the \'default\' value \'test\' instead of the \'example\' value', function () {
-      return popsicle.default(
-        {
-          method: 'GET',
-          url: '/api/headersdefaultbeforeexample'
-        }
-      )
-        .use(server(http))
+      return makeFetcher(http).fetch('/api/headersdefaultbeforeexample', {
+        method: 'GET'
+      })
         .then(function (res) {
-          expect(res.headers.foo).to.equal('test')
+          expect(res.headers.get('foo')).to.equal('test')
         })
     })
 
     it('should return a header \'foo\' equal to the \'default\' value \'test\'', function () {
-      return popsicle.default(
-        {
-          method: 'GET',
-          url: '/api/headersdefault'
-        }
-      )
-        .use(server(http))
+      return makeFetcher(http).fetch('/api/headersdefault', {
+        method: 'GET'
+      })
         .then(function (res) {
-          expect(res.headers.foo).to.equal('test')
+          expect(res.headers.get('foo')).to.equal('test')
         })
     })
 
     it('should return a header \'foo\' equal to the \'example\' value \'bar\'', function () {
-      return popsicle.default(
-        {
-          method: 'GET',
-          url: '/api/headersexample'
-        }
-      )
-        .use(server(http))
+      return makeFetcher(http).fetch('/api/headersexample', {
+        method: 'GET'
+      })
         .then(function (res) {
-          expect(res.headers.foo).to.equal('bar')
+          expect(res.headers.get('foo')).to.equal('bar')
         })
     })
 
     it('should return a header \'foo\' equal to any of the \'examples\' value defined', function () {
-      return popsicle.default(
-        {
-          method: 'GET',
-          url: '/api/headersexamples'
-        }
-      )
-        .use(server(http))
+      return makeFetcher(http).fetch('/api/headersexamples', {
+        method: 'GET'
+      })
         .then(function (res) {
-          expect(res.headers.foo).to.be.oneOf(['bar', 'foo', 'random', 'another'])
+          expect(res.headers.get('foo')).to.be.oneOf(['bar', 'foo', 'random', 'another'])
         })
     })
 
     it('should default to document\'s mediatype', function () {
-      return popsicle.default(
-        {
-          method: 'GET',
-          url: '/api/defaultmediatype'
-        }
-      )
-        .use(server(http))
+      return makeFetcher(http).fetch('/api/defaultmediatype', {
+        method: 'GET'
+      })
         .then(function (res) {
           expect(JSON.parse(res.body))
             .to.deep.equal({ stringProperty: 'foo', numberProperty: 23 })
@@ -185,13 +144,9 @@ describe('osprey mock service v1.0', function () {
     })
 
     it('should respect ext', function () {
-      return popsicle.default(
-        {
-          method: 'GET',
-          url: '/api/ext.json'
-        }
-      )
-        .use(server(http))
+      return makeFetcher(http).fetch('/api/ext.json', {
+        method: 'GET'
+      })
         .then(function (res) {
           expect(JSON.parse(res.body))
             .to.deep.equal({ stringProperty: 'foo', numberProperty: 23 })
@@ -199,13 +154,9 @@ describe('osprey mock service v1.0', function () {
     })
 
     it('should return property-level examples from type.', function () {
-      return popsicle.default(
-        {
-          method: 'GET',
-          url: '/api/user'
-        }
-      )
-        .use(server(http))
+      return makeFetcher(http).fetch('/api/user', {
+        method: 'GET'
+      })
         .then(function (res) {
           expect(JSON.parse(res.body).name).to.equal('Kendrick')
           expect(JSON.parse(res.body).lastname).to.equal('Lamar')
