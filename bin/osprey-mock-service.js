@@ -2,9 +2,10 @@
 
 const http = require('http')
 const finalhandler = require('finalhandler')
-const mock = require('../')
 const Router = require('osprey').Router
 const morgan = require('morgan')
+
+const mock = require('../')
 
 const argv = require('yargs')
   .usage(

@@ -1,5 +1,5 @@
 const Negotiator = require('negotiator')
-const resources = require('osprey-resources')
+const ospreyResources = require('osprey-resources')
 const osprey = require('osprey')
 
 /**
@@ -13,25 +13,25 @@ module.exports.loadFile = loadFile
 /**
  * Create an Osprey server instance.
  *
- * @param  {Object}   raml
+ * @param  {webapi-parser.WebApiDocument} model
  * @return {Function}
  */
-function ospreyMockServer (raml) {
-  return resources(raml.resources, handler)
+function ospreyMockServer (model) {
+  return ospreyResources(model.endPoints, mockHandler)
 }
 
 /**
  * Create a server with Osprey and the mock service.
  *
- * @param  {Object}   raml
- * @param  {Object}   options
+ * @param  {webapi-parser.WebApiDocument} model
+ * @param  {Object} options
  * @return {Function}
  */
-function createServer (raml, options) {
+function createServer (model, options) {
   const app = osprey.Router()
 
-  app.use(osprey.server(raml, options))
-  app.use(ospreyMockServer(raml))
+  app.use(osprey.server(model, options))
+  app.use(ospreyMockServer(model))
   app.use(osprey.errorHandler())
 
   return app
@@ -40,15 +40,19 @@ function createServer (raml, options) {
 /**
  * Create a mock service using the base uri path.
  *
- * @param  {Object}   raml
- * @param  {Object}   options
+ * @param  {webapi-parser.WebApiDocument} model
+ * @param  {Object} options
  * @return {Function}
  */
-function createServerFromBaseUri (raml, options) {
+function createServerFromBaseUri (model, options) {
   const app = osprey.Router()
-  const path = (raml.baseUri || '').replace(/^(\w+:)?\/\/[^/]+/, '') || '/'
 
-  app.use(path, raml.baseUriParameters, createServer(raml, options))
+  const serverEl = model.encodes.servers[0]
+  const baseUri = (serverEl && serverEl.uri.option) || ''
+  const path = baseUri.replace(/^(\w+:)?\/\/[^/]+/, '') || '/'
+
+  const baseUriParameters = (serverEl && serverEl.variables) || []
+  app.use(path, baseUriParameters, createServer(model, options))
 
   return app
 }
@@ -56,21 +60,19 @@ function createServerFromBaseUri (raml, options) {
 /**
  * Create a mock service from a filename.
  *
- * @param  {String}   filename
- * @param  {Object}   options
+ * @param  {String} fpath
+ * @param  {Object} options
  * @return {Function}
  */
-function loadFile (filename, options) {
+async function loadFile (fpath, options) {
+  const wap = require('webapi-parser')
+
   options = options || {}
-  return require('raml-1-parser')
-    .loadRAML(filename, { rejectOnErrors: true })
-    .then(function (ramlApi) {
-      const raml = ramlApi.expand(true).toJSON({
-        serializeMetadata: false
-      })
-      options.RAMLVersion = ramlApi.RAMLVersion()
-      return createServerFromBaseUri(raml, options)
-    })
+  fpath = fpath.startsWith('file:') ? fpath : `file://${fpath}`
+  const model = await wap.raml10.parse(`file://${fpath}`)
+  const resolved = await wap.raml10.resolve(model)
+
+  return createServerFromBaseUri(resolved, options)
 }
 
 /**
@@ -93,7 +95,7 @@ function getSingleExample (obj) {
  * @param  {Object}   method
  * @return {Function}
  */
-function handler (method) {
+function mockHandler (method) {
   const statusCode = getStatusCode(method)
   const response = (method.responses || {})[statusCode] || {}
   const bodies = response.body || {}
