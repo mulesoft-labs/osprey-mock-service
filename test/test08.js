@@ -1,14 +1,14 @@
 /* global describe, it, before */
 
-var expect = require('chai').expect
-var mockService = require('../')
-var httpes = require('http')
-var path = require('path')
-var finalhandler = require('finalhandler')
-var makeFetcher = require('./utils').makeFetcher
+const expect = require('chai').expect
+const mockService = require('../')
+const httpes = require('http')
+const path = require('path')
+const finalhandler = require('finalhandler')
+const makeFetcher = require('./utils').makeFetcher
 
 describe('osprey mock service v0.8', function () {
-  var http
+  let http
 
   before(function () {
     this.timeout(3000)

@@ -1,6 +1,6 @@
-var Negotiator = require('negotiator')
-var resources = require('osprey-resources')
-var osprey = require('osprey')
+const Negotiator = require('negotiator')
+const resources = require('osprey-resources')
+const osprey = require('osprey')
 
 /**
  * Export the mock server.
@@ -28,7 +28,7 @@ function ospreyMockServer (raml) {
  * @return {Function}
  */
 function createServer (raml, options) {
-  var app = osprey.Router()
+  const app = osprey.Router()
 
   app.use(osprey.server(raml, options))
   app.use(ospreyMockServer(raml))
@@ -45,8 +45,8 @@ function createServer (raml, options) {
  * @return {Function}
  */
 function createServerFromBaseUri (raml, options) {
-  var app = osprey.Router()
-  var path = (raml.baseUri || '').replace(/^(\w+:)?\/\/[^/]+/, '') || '/'
+  const app = osprey.Router()
+  const path = (raml.baseUri || '').replace(/^(\w+:)?\/\/[^/]+/, '') || '/'
 
   app.use(path, raml.baseUriParameters, createServer(raml, options))
 
@@ -65,7 +65,7 @@ function loadFile (filename, options) {
   return require('raml-1-parser')
     .loadRAML(filename, { rejectOnErrors: true })
     .then(function (ramlApi) {
-      var raml = ramlApi.expand(true).toJSON({
+      const raml = ramlApi.expand(true).toJSON({
         serializeMetadata: false
       })
       options.RAMLVersion = ramlApi.RAMLVersion()
@@ -80,7 +80,7 @@ function loadFile (filename, options) {
  */
 function getSingleExample (obj) {
   if (obj.examples) {
-    var randomIndex = Math.floor(Math.random() * obj.examples.length)
+    const randomIndex = Math.floor(Math.random() * obj.examples.length)
     return obj.examples[randomIndex].value || obj.examples[randomIndex]
   } else {
     return obj.example
@@ -94,37 +94,38 @@ function getSingleExample (obj) {
  * @return {Function}
  */
 function handler (method) {
-  var statusCode = getStatusCode(method)
-  var response = (method.responses || {})[statusCode] || {}
-  var bodies = response.body || {}
-  var headers = {}
-  var types = Object.keys(bodies)
+  const statusCode = getStatusCode(method)
+  const response = (method.responses || {})[statusCode] || {}
+  const bodies = response.body || {}
+  const headers = {}
+  const types = Object.keys(bodies)
 
   // Set up the default response headers.
   if (response.headers) {
     Object.keys(response.headers).forEach(function (headerName) {
-      var header = response.headers[headerName]
+      const header = response.headers[headerName]
       if (header.default) {
         headers[header.name] = header.default
       } else if (header.example || header.examples) {
-        var example = getSingleExample(header)
+        const example = getSingleExample(header)
         headers[header.name] = example
       }
     })
   }
 
   return function (req, res) {
-    var negotiator = new Negotiator(req)
-    var type = negotiator.mediaType(types)
+    const negotiator = new Negotiator(req)
+    let type = negotiator.mediaType(types)
     if (req.params && (req.params.mediaTypeExtension || req.params.ext)) {
-      var ext = req.params.mediaTypeExtension || req.params.ext
+      let ext = req.params.mediaTypeExtension || req.params.ext
       ext = ext.slice(1)
       type = 'application/' + ext
     }
-    var body = bodies[type] || {}
+    const body = bodies[type] || {}
 
+    let propertiesExample
     if (body && body.properties) {
-      var propertiesExample = Object.keys(body.properties).reduce(function (example, property) {
+      propertiesExample = Object.keys(body.properties).reduce(function (example, property) {
         if (body.properties[property].example) {
           example[property] = body.properties[property].example
         }
@@ -136,7 +137,7 @@ function handler (method) {
 
     if (type) {
       res.setHeader('Content-Type', type)
-      var example = body.example
+      let example = body.example
 
       // Parse body.examples
       if (Array.isArray(body.examples)) {

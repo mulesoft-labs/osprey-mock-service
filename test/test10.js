@@ -1,14 +1,14 @@
 /* global describe, it, before */
 
-var expect = require('chai').expect
-var mockService = require('../')
-var httpes = require('http')
-var path = require('path')
-var finalhandler = require('finalhandler')
-var makeFetcher = require('./utils').makeFetcher
+const expect = require('chai').expect
+const mockService = require('../')
+const httpes = require('http')
+const path = require('path')
+const finalhandler = require('finalhandler')
+const makeFetcher = require('./utils').makeFetcher
 
 describe('osprey mock service v1.0', function () {
-  var http
+  let http
 
   before(function () {
     this.timeout(3000)
@@ -60,7 +60,7 @@ describe('osprey mock service v1.0', function () {
         method: 'GET'
       })
         .then(function (res) {
-          var match = /example./.test(JSON.parse(res.body).name)
+          const match = /example./.test(JSON.parse(res.body).name)
           expect(match).to.equal(true)
           expect(res.status).to.equal(200)
         })
@@ -71,7 +71,7 @@ describe('osprey mock service v1.0', function () {
         .then(function (res) {
           makeFetcher(http).fetch('/api/examples', { method: 'GET' })
             .then(function (res) {
-              var match = /example./.test(JSON.parse(res.body).name)
+              const match = /example./.test(JSON.parse(res.body).name)
               expect(match).to.equal(true)
               expect(res.status).to.equal(200)
             })
