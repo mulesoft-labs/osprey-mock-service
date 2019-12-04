@@ -6,7 +6,7 @@ function makeFetcher (app) {
   var compose = require('throwback').compose
   var Request = require('servie').Request
   var popsicle = require('popsicle')
-  var popsicleServer = require('popsicle-server')
+  var popsicleServer = require('popsicle-server').server
 
   // Set response text to "body" property to mimic popsicle v10
   // response interface.

@@ -163,7 +163,7 @@ describe('osprey mock service v1.0', function () {
           expect(JSON.parse(res.body).age).to.equal(10)
           expect(JSON.parse(res.body).good).to.equal(true)
           expect(JSON.parse(res.body).array).to.eql(['foo', 'bar'])
-          expect(JSON.parse(res.body).object).to.eql({ 'foo': 1, 'bar': 2 })
+          expect(JSON.parse(res.body).object).to.eql({ foo: 1, bar: 2 })
         })
     })
   })
