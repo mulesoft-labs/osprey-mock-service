@@ -125,12 +125,13 @@ function handler (method) {
 
     let propertiesExample
     if (body && body.properties) {
-      propertiesExample = Object.keys(body.properties).reduce(function (example, property) {
-        if (body.properties[property].example) {
-          example[property] = body.properties[property].example
-        }
-        return example
-      }, {})
+      propertiesExample = Object.keys(body.properties)
+        .reduce(function (example, property) {
+          if (body.properties[property].example) {
+            example[property] = body.properties[property].example
+          }
+          return example
+        }, {})
     }
     res.statusCode = statusCode
     setHeaders(res, headers)
@@ -152,9 +153,13 @@ function handler (method) {
       }
 
       if (example) {
-        res.write(typeof example !== 'string' ? JSON.stringify(example) : example)
+        res.write(typeof example !== 'string'
+          ? JSON.stringify(example)
+          : example)
       } else if (propertiesExample) {
-        res.write(typeof propertiesExample === 'object' ? JSON.stringify(propertiesExample) : propertiesExample)
+        res.write(typeof propertiesExample === 'object'
+          ? JSON.stringify(propertiesExample)
+          : propertiesExample)
       }
     }
 

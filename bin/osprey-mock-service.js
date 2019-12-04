@@ -34,7 +34,9 @@ mock.loadFile(argv.f, options)
     })
 
     server.listen(argv.p, function () {
-      console.log('Mock service running at http://localhost:' + server.address().port)
+      console.log(
+        'Mock service running at http://localhost:' +
+        server.address().port)
     })
   })
   .catch(function (err) {
