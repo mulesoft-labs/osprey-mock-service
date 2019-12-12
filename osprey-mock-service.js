@@ -78,42 +78,47 @@ async function loadFile (fpath, options) {
 /**
  * Returns either a random example from examples or the single example.
  *
- * @param {Object} obj
+ * @param {webapi-parser.Parameter|Payload} element
  */
-function getSingleExample (obj) {
-  if (obj.examples) {
-    const randomIndex = Math.floor(Math.random() * obj.examples.length)
-    return obj.examples[randomIndex].value || obj.examples[randomIndex]
-  } else {
-    return obj.example
-  }
+function getSingleExample (element) {
+  return (
+    element.schema.examples &&
+    element.schema.examples[0].value.option)
 }
 
 /**
  * Create a RAML example method handler.
  *
- * @param  {Object}   method
+ * @param  {webapi-parser.Operation} method
  * @return {Function}
  */
 function mockHandler (method) {
-  const statusCode = getStatusCode(method)
-  const response = (method.responses || {})[statusCode] || {}
-  const bodies = response.body || {}
-  const headers = {}
-  const types = Object.keys(bodies)
+  const response = method.responses && method.responses[0]
+  const statusCode = response
+    ? parseInt(response.statusCode.value())
+    : 200
 
   // Set up the default response headers.
-  if (response.headers) {
-    Object.keys(response.headers).forEach(function (headerName) {
-      const header = response.headers[headerName]
-      if (header.default) {
-        headers[header.name] = header.default
-      } else if (header.example || header.examples) {
-        const example = getSingleExample(header)
-        headers[header.name] = example
+  const headers = {}
+  if (response && response.headers) {
+    response.headers.forEach(header => {
+      const defaultVal = (
+        header.schema.defaultValueStr &&
+        header.schema.defaultValueStr.option)
+      const example = getSingleExample(header)
+      if (defaultVal) {
+        headers[header.name.value()] = defaultVal
+      } else if (example) {
+        headers[header.name.value()] = example
       }
     })
   }
+
+  const bodies = {}
+  response.payloads.forEach(pl => {
+    bodies[pl.mediaType.value()] = pl
+  })
+  const types = Object.keys(bodies)
 
   return function (req, res) {
     const negotiator = new Negotiator(req)
@@ -125,34 +130,22 @@ function mockHandler (method) {
     }
     const body = bodies[type] || {}
 
-    let propertiesExample
-    if (body && body.properties) {
-      propertiesExample = Object.keys(body.properties)
-        .reduce(function (example, property) {
-          if (body.properties[property].example) {
-            example[property] = body.properties[property].example
-          }
-          return example
-        }, {})
+    const propertiesExample = {}
+    if (body && body.schema && body.schema.properties) {
+      body.schema.properties.forEach(prop => {
+        const exampleEl = prop.range.examples && prop.range.examples[0]
+        const exampleVal = exampleEl && exampleEl.value.option
+        if (exampleVal) {
+          propertiesExample[prop.name.value()] = exampleVal
+        }
+      })
     }
     res.statusCode = statusCode
     setHeaders(res, headers)
 
     if (type) {
       res.setHeader('Content-Type', type)
-      let example = body.example
-
-      // Parse body.examples
-      if (Array.isArray(body.examples)) {
-        body.examples = body.examples.map(function (ex) {
-          if (ex.structuredValue) {
-            return ex.structuredValue
-          } else {
-            return ex
-          }
-        })
-        example = getSingleExample(body)
-      }
+      const example = getSingleExample(body)
 
       if (example) {
         res.write(typeof example !== 'string'
@@ -167,16 +160,6 @@ function mockHandler (method) {
 
     res.end()
   }
-}
-
-/**
- * Get an appropriate HTTP response code.
- *
- * @param  {Object} method
- * @return {Number}
- */
-function getStatusCode (method) {
-  return Object.keys(method.responses || {})[0] || 200
 }
 
 /**
