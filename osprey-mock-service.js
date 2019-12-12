@@ -17,7 +17,7 @@ module.exports.loadFile = loadFile
  * @return {Function}
  */
 function ospreyMockServer (model) {
-  return ospreyResources(model.endPoints, mockHandler)
+  return ospreyResources(model.encodes.endPoints, mockHandler)
 }
 
 /**
@@ -48,7 +48,7 @@ function createServerFromBaseUri (model, options) {
   const app = osprey.Router()
 
   const serverEl = model.encodes.servers[0]
-  const baseUri = (serverEl && serverEl.uri.option) || ''
+  const baseUri = (serverEl && serverEl.url.option) || ''
   const path = baseUri.replace(/^(\w+:)?\/\/[^/]+/, '') || '/'
 
   const baseUriParameters = (serverEl && serverEl.variables) || []
@@ -65,14 +65,17 @@ function createServerFromBaseUri (model, options) {
  * @return {Function}
  */
 async function loadFile (fpath, options) {
-  const wap = require('webapi-parser')
-
-  options = options || {}
+  const wap = require('webapi-parser').WebApiParser
   fpath = fpath.startsWith('file:') ? fpath : `file://${fpath}`
-  const model = await wap.raml10.parse(`file://${fpath}`)
-  const resolved = await wap.raml10.resolve(model)
-
-  return createServerFromBaseUri(resolved, options)
+  let model, resolved
+  try {
+    model = await wap.raml10.parse(fpath)
+    resolved = await wap.raml10.resolve(model)
+  } catch (e) {
+    model = await wap.raml08.parse(fpath)
+    resolved = await wap.raml08.resolve(model)
+  }
+  return createServerFromBaseUri(resolved, options || {})
 }
 
 /**

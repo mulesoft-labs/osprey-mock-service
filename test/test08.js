@@ -2,7 +2,7 @@
 
 const expect = require('chai').expect
 const mockService = require('../')
-const httpes = require('http')
+const httpLib = require('http')
 const path = require('path')
 const finalhandler = require('finalhandler')
 const makeFetcher = require('./utils').makeFetcher
@@ -12,10 +12,12 @@ describe('osprey mock service v0.8', function () {
 
   before(function () {
     this.timeout(3000)
-    return mockService.loadFile(path.join(__dirname, '/fixtures/example08.raml'), { server: { cors: true, compression: true } })
-      .then(function (raml) {
-        http = httpes.createServer(function (req, res) {
-          return raml(req, res, finalhandler(req, res))
+    return mockService.loadFile(
+      path.join(__dirname, '/fixtures/example08.raml'),
+      { server: { cors: true, compression: true } })
+      .then(function (app) {
+        http = httpLib.createServer(function (req, res) {
+          return app(req, res, finalhandler(req, res))
         })
       })
   })

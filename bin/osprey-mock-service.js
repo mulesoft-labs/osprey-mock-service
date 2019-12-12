@@ -5,7 +5,7 @@ const finalhandler = require('finalhandler')
 const Router = require('osprey').Router
 const morgan = require('morgan')
 
-const mock = require('../')
+const ospreyMockService = require('../')
 
 const argv = require('yargs')
   .usage(
@@ -22,7 +22,7 @@ const options = {
   cors: !!argv.cors
 }
 
-mock.loadFile(argv.f, options)
+ospreyMockService.loadFile(argv.f, options)
   .then(function (app) {
     const router = new Router()
 
