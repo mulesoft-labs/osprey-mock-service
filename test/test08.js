@@ -8,18 +8,17 @@ const finalhandler = require('finalhandler')
 const makeFetcher = require('./utils').makeFetcher
 
 describe('osprey mock service v0.8', function () {
-  let http
+  let app
 
-  before(function () {
+  before(async function () {
     this.timeout(3000)
-    return mockService.loadFile(
+    const createdApp = await mockService.loadFile(
       path.join(__dirname, '/fixtures/example08.raml'),
-      { server: { cors: true, compression: true } })
-      .then(function (app) {
-        http = httpLib.createServer(function (req, res) {
-          return app(req, res, finalhandler(req, res))
-        })
-      })
+      { server: { cors: true, compression: true } }
+    )
+    app = httpLib.createServer(function (req, res) {
+      return createdApp(req, res, finalhandler(req, res))
+    })
   })
 
   describe('routes', function () {
@@ -28,17 +27,18 @@ describe('osprey mock service v0.8', function () {
     })
 
     it('should respond with example parameter', function () {
-      return makeFetcher(http).fetch('/api/test', {
+      return makeFetcher(app).fetch('/api/test', {
         method: 'GET'
       })
         .then(function (res) {
-          expect(JSON.parse(res.body)).to.deep.equal({ success: true })
+          console.log(res.body)
           expect(res.status).to.equal(200)
+          expect(JSON.parse(res.body)).to.deep.equal({ success: true })
         })
     })
 
     it('should reject undefined route', function () {
-      return makeFetcher(http).fetch('/api/unknown', {
+      return makeFetcher(app).fetch('/api/unknown', {
         method: 'GET'
       })
         .then(function (res) {
@@ -47,7 +47,7 @@ describe('osprey mock service v0.8', function () {
     })
 
     it('should have empty body when there are no example property', function () {
-      return makeFetcher(http).fetch('/api/noexample', {
+      return makeFetcher(app).fetch('/api/noexample', {
         method: 'GET'
       })
         .then(function (res) {
@@ -57,7 +57,7 @@ describe('osprey mock service v0.8', function () {
     })
 
     it('should respect mediaTypeExtensions (application/json)', function () {
-      return makeFetcher(http).fetch('/api/mediatypeextension.json', {
+      return makeFetcher(app).fetch('/api/mediatypeextension.json', {
         method: 'GET'
       })
         .then(function (res) {
@@ -66,7 +66,7 @@ describe('osprey mock service v0.8', function () {
     })
 
     it('should respect mediaTypeExtensions (application/xml)', function () {
-      return makeFetcher(http).fetch('/api/mediatypeextension.xml', {
+      return makeFetcher(app).fetch('/api/mediatypeextension.xml', {
         method: 'GET'
       })
         .then(function (res) {
