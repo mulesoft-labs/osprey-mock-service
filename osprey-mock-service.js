@@ -16,8 +16,8 @@ module.exports.loadFile = loadFile
  * @param  {Object}   raml
  * @return {Function}
  */
-function ospreyMockServer (raml) {
-  return resources(raml.resources, handler)
+function ospreyMockServer (raml, routerOpts) {
+  return resources(raml.resources, handler, routerOpts)
 }
 
 /**
@@ -28,10 +28,11 @@ function ospreyMockServer (raml) {
  * @return {Function}
  */
 function createServer (raml, options) {
-  var app = osprey.Router()
+  var routerOpts = { RAMLVersion: options.RAMLVersion };
+  var app = osprey.Router(routerOpts)
 
   app.use(osprey.server(raml, options))
-  app.use(ospreyMockServer(raml))
+  app.use(ospreyMockServer(raml, routerOpts))
   app.use(osprey.errorHandler())
 
   return app
