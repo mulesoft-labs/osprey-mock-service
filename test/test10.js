@@ -1,8 +1,8 @@
 /* global describe, it, before */
 
 const expect = require('chai').expect
-const mockService = require('../')
-const httpLib = require('http')
+const ospreyMockService = require('../')
+const httpes = require('http')
 const path = require('path')
 const finalhandler = require('finalhandler')
 const makeFetcher = require('./utils').makeFetcher
@@ -10,21 +10,21 @@ const makeFetcher = require('./utils').makeFetcher
 describe('osprey mock service v1.0', function () {
   let http
 
-  before(function () {
+  before(async function () {
     this.timeout(3000)
-    return mockService.loadFile(
-      path.join(__dirname, '/fixtures/example10.raml'),
-      { server: { cors: true, compression: true } })
-      .then(function (app) {
-        http = httpLib.createServer(function (req, res) {
-          return app(req, res, finalhandler(req, res))
+    const fpath = path.join(__dirname, '/fixtures/example10.raml')
+    const opts = { server: { cors: true, compression: true } }
+    return ospreyMockService.loadFile(fpath, opts)
+      .then(server => {
+        http = httpes.createServer(function (req, res) {
+          return server(req, res, finalhandler(req, res))
         })
       })
   })
 
   describe('routes', function () {
     it('should expose a function', function () {
-      expect(mockService).to.be.a('function')
+      expect(ospreyMockService).to.be.a('function')
     })
 
     it('should respond with example parameter', function () {
