@@ -32,8 +32,8 @@ describe('osprey mock service v1.0', function () {
         method: 'GET'
       })
         .then(function (res) {
-          expect(JSON.parse(res.body)).to.deep.equal({ success: true })
           expect(res.status).to.equal(200)
+          expect(JSON.parse(res.body)).to.deep.equal({ success: true })
         })
     })
 
@@ -42,8 +42,8 @@ describe('osprey mock service v1.0', function () {
         method: 'GET'
       })
         .then(function (res) {
-          expect(JSON.parse(res.body)).to.deep.equal({ nested: { success: true } })
           expect(res.status).to.equal(200)
+          expect(JSON.parse(res.body)).to.deep.equal({ nested: { success: 'true' } })
         })
     })
 
@@ -52,8 +52,8 @@ describe('osprey mock service v1.0', function () {
         method: 'GET'
       })
         .then(function (res) {
-          expect(JSON.parse(res.body)).to.equal(true)
           expect(res.status).to.equal(200)
+          expect(JSON.parse(res.body)).to.equal(true)
         })
     })
 
@@ -62,9 +62,9 @@ describe('osprey mock service v1.0', function () {
         method: 'GET'
       })
         .then(function (res) {
+          expect(res.status).to.equal(200)
           const match = /example./.test(JSON.parse(res.body).name)
           expect(match).to.equal(true)
-          expect(res.status).to.equal(200)
         })
     })
 
@@ -73,9 +73,9 @@ describe('osprey mock service v1.0', function () {
         .then(function (res) {
           makeFetcher(http).fetch('/api/examples', { method: 'GET' })
             .then(function (res) {
+              expect(res.status).to.equal(200)
               const match = /example./.test(JSON.parse(res.body).name)
               expect(match).to.equal(true)
-              expect(res.status).to.equal(200)
             })
         })
     })
@@ -160,12 +160,13 @@ describe('osprey mock service v1.0', function () {
         method: 'GET'
       })
         .then(function (res) {
-          expect(JSON.parse(res.body).name).to.equal('Kendrick')
-          expect(JSON.parse(res.body).lastname).to.equal('Lamar')
-          expect(JSON.parse(res.body).age).to.equal(10)
-          expect(JSON.parse(res.body).good).to.equal(true)
-          expect(JSON.parse(res.body).array).to.eql(['foo', 'bar'])
-          expect(JSON.parse(res.body).object).to.eql({ foo: 1, bar: 2 })
+          const body = JSON.parse(res.body)
+          expect(body.name).to.equal('Kendrick')
+          expect(body.lastname).to.equal('Lamar')
+          expect(body.age).to.equal(10)
+          expect(body.good).to.equal(true)
+          expect(body.array).to.eql(['foo', 'bar'])
+          expect(body.object).to.eql({ foo: '1', bar: '2' })
         })
     })
   })

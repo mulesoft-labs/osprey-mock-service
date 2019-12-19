@@ -1,6 +1,7 @@
 const Negotiator = require('negotiator')
 const ospreyResources = require('osprey-resources')
 const osprey = require('osprey')
+const ramlSanitize = require('raml-sanitize')()
 
 /**
  * Export the mock server.
@@ -79,14 +80,62 @@ async function loadFile (fpath, options) {
 }
 
 /**
- * Returns either a random example from examples or the single example.
+ * Returns a single example of the body.
  *
- * @param {webapi-parser.Parameter|Payload} element
+ * @param {webapi-parser.AnyShape} schema
  */
-function getSingleExample (element) {
-  return (
-    element.schema.examples &&
-    element.schema.examples[0].value.option)
+function getSchemaExample (schema) {
+  const exNode = schema.examples && schema.examples[0]
+  if (!exNode) {
+    return
+  }
+  const exValue = exNode.value.option && exNode.value.option.trim()
+  const isJson = exValue && exValue.startsWith('{')
+  const isXml = exValue && exValue.startsWith('<')
+  const isStructured = !!exNode.structuredValue
+  if (!isStructured || isJson || isXml) {
+    return exValue
+  }
+  return extractDataNodeValue(exNode.structuredValue)
+}
+
+/**
+ * Extracts data from DataNode subclass instance.
+ *
+ * @param {webapi-parser.DataNode} dNode
+ */
+function extractDataNodeValue (dNode) {
+  // ScalarNode
+  if (dNode.dataType !== undefined) {
+    return dNode.value.option
+  }
+  // ArrayNode
+  if (dNode.members !== undefined) {
+    return dNode.members.map(extractDataNodeValue)
+  }
+  // ObjectNode
+  if (dNode.properties !== undefined) {
+    const data = {}
+    Object.keys(dNode.properties).forEach(name => {
+      data[name] = extractDataNodeValue(dNode.properties[name])
+    })
+    if (Object.keys(data).length > 0) {
+      return data
+    }
+  }
+}
+
+/**
+ * Returns a single example of the header.
+ *
+ * @param {webapi-parser.Parameter} header
+ */
+function getHeaderExample (header) {
+  const example = (
+    header.schema.examples &&
+    header.schema.examples[0] &&
+    header.schema.examples[0].value.option)
+  return example ? example.trim() : undefined
 }
 
 /**
@@ -108,7 +157,7 @@ function mockHandler (method) {
       const defaultVal = (
         header.schema.defaultValueStr &&
         header.schema.defaultValueStr.option)
-      const example = getSingleExample(header)
+      const example = getHeaderExample(header)
       if (defaultVal) {
         headers[header.name.value()] = defaultVal
       } else if (example) {
@@ -133,31 +182,35 @@ function mockHandler (method) {
     }
     const body = bodies[type] || {}
 
-    const propertiesExample = {}
-    if (body && body.schema && body.schema.properties) {
-      body.schema.properties.forEach(prop => {
-        const exampleEl = prop.range.examples && prop.range.examples[0]
-        const exampleVal = exampleEl && exampleEl.value.option
-        if (exampleVal) {
-          propertiesExample[prop.name.value()] = exampleVal
-        }
-      })
-    }
     res.statusCode = statusCode
     setHeaders(res, headers)
 
     if (type) {
       res.setHeader('Content-Type', type)
-      const example = getSingleExample(body)
+      const example = getSchemaExample(body.schema)
+      const sanitizer = ramlSanitize(body.schema.properties)
+      const sanitize = (obj) => typeof obj === 'object' ? sanitizer(obj) : obj
 
       if (example) {
         res.write(typeof example !== 'string'
-          ? JSON.stringify(example)
+          ? JSON.stringify(sanitize(example))
           : example)
-      } else if (propertiesExample) {
-        res.write(typeof propertiesExample === 'object'
-          ? JSON.stringify(propertiesExample)
-          : propertiesExample)
+      } else {
+        let propertiesExample
+        if (body && body.schema && body.schema.properties) {
+          propertiesExample = {}
+          body.schema.properties.forEach(prop => {
+            const exampleVal = getSchemaExample(prop.range)
+            if (exampleVal) {
+              propertiesExample[prop.name.value()] = exampleVal
+            }
+          })
+        }
+        if (propertiesExample) {
+          res.write(typeof propertiesExample === 'object'
+            ? JSON.stringify(sanitize(propertiesExample))
+            : propertiesExample)
+        }
       }
     }
 

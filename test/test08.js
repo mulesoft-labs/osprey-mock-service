@@ -32,7 +32,6 @@ describe('osprey mock service v0.8', function () {
         method: 'GET'
       })
         .then(function (res) {
-          console.log(res.body)
           expect(res.status).to.equal(200)
           expect(JSON.parse(res.body)).to.deep.equal({ success: true })
         })
