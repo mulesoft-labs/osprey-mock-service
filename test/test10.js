@@ -166,7 +166,7 @@ describe('osprey mock service v1.0', function () {
           expect(body.age).to.equal(10)
           expect(body.good).to.equal(true)
           expect(body.array).to.eql(['foo', 'bar'])
-          expect(body.object).to.eql({ foo: '1', bar: '2' })
+          expect(body.object).to.eql({ foo: 1, bar: 2 })
         })
     })
   })
