@@ -167,9 +167,11 @@ function mockHandler (method) {
   }
 
   const bodies = {}
-  response.payloads.forEach(pl => {
-    bodies[pl.mediaType.value()] = pl
-  })
+  if (response) {
+    response.payloads.forEach(pl => {
+      bodies[pl.mediaType.value()] = pl
+    })
+  }
   const types = Object.keys(bodies)
 
   return function (req, res) {
