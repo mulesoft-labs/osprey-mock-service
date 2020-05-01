@@ -68,7 +68,7 @@ function loadFile (filename, options) {
       var raml = ramlApi.expand(true).toJSON({
         serializeMetadata: false
       })
-      options['RAMLVersion'] = ramlApi.RAMLVersion()
+      options.RAMLVersion = ramlApi.RAMLVersion()
       return createServerFromBaseUri(raml, options)
     })
 }
