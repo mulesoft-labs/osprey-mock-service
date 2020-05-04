@@ -11,7 +11,7 @@ describe('osprey mock service v0.8', function () {
   let http
 
   before(async function () {
-    this.timeout(3000)
+    this.timeout(5000)
     const fpath = path.join(__dirname, '/fixtures/example08.raml')
     const opts = { server: { cors: true, compression: true } }
     return ospreyMockService.loadFile(fpath, opts)
