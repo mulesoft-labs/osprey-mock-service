@@ -49,7 +49,7 @@
     "morgan": "^1.7.0",
     "negotiator": "^0.6.0",
     "osprey": "^0.5.2",
-    "osprey-resources": "^0.8.2",
+    "osprey-resources": "^0.9.0",
     "raml-1-parser": "^1.1.52",
     "yargs": "^15.3.1"
   }
