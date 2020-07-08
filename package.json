@@ -1,6 +1,6 @@
 {
   "name": "osprey-mock-service",
-  "version": "0.4.4",
+  "version": "0.5.1",
   "description": "Generate an API mock service from a RAML definition using Osprey",
   "main": "osprey-mock-service.js",
   "files": [
@@ -42,7 +42,7 @@
     "popsicle": "^12.0.5",
     "popsicle-server": "^3.0.0",
     "pre-commit": "^1.0.1",
-    "standard": "^14.3.3"
+    "standard": "^14.3.4"
   },
   "dependencies": {
     "finalhandler": "^1.1.1",
