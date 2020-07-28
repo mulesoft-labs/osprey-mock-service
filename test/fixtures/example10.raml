@@ -26,6 +26,9 @@ types:
           - bar
       object:
         type: object
+        properties:
+          foo: number
+          bar: number
         example:
           foo: 1
           bar: 2
@@ -37,6 +40,8 @@ types:
         headers:
         body:
           application/json:
+            properties:
+              success: boolean
             example:
               success: true
 
@@ -46,6 +51,10 @@ types:
       200:
         body:
           application/json:
+            properties:
+              nested:
+                properties:
+                  success: true
             example:
               nested:
                 success: true
@@ -65,6 +74,8 @@ types:
       200:
         body:
           application/json:
+            properties:
+              name: string
             examples:
               example1:
                 name: example1
@@ -84,6 +95,7 @@ types:
       200:
         headers:
           foo:
+            type: string
             example: bar
             default: test
 
@@ -93,6 +105,7 @@ types:
       200:
         headers:
           foo:
+            type: string
             example: bar
 
 /headersexamples:
@@ -101,6 +114,7 @@ types:
       200:
         headers:
           foo:
+            type: string
             examples:
               first: bar
               second: foo
@@ -113,6 +127,7 @@ types:
       200:
         headers:
           foo:
+            type: string
             default: test
 
 /defaultmediatype:
@@ -120,6 +135,9 @@ types:
     responses:
       200:
         body:
+          properties:
+            stringProperty: string
+            numberProperty: number
           example:
             stringProperty: foo
             numberProperty: 23
@@ -130,6 +148,9 @@ types:
       200:
         body:
           application/json:
+            properties:
+              stringProperty: string
+              numberProperty: number
             example:
               stringProperty: foo
               numberProperty: 23

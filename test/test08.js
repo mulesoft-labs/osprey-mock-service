@@ -1,28 +1,30 @@
 /* global describe, it, before */
 
-var expect = require('chai').expect
-var mockService = require('../')
-var httpes = require('http')
-var path = require('path')
-var finalhandler = require('finalhandler')
-var makeFetcher = require('./utils').makeFetcher
+const expect = require('chai').expect
+const ospreyMockService = require('../')
+const httpes = require('http')
+const path = require('path')
+const finalhandler = require('finalhandler')
+const makeFetcher = require('./utils').makeFetcher
 
 describe('osprey mock service v0.8', function () {
-  var http
+  let http
 
-  before(function () {
-    this.timeout(3000)
-    return mockService.loadFile(path.join(__dirname, '/fixtures/example08.raml'), { server: { cors: true, compression: true } })
-      .then(function (raml) {
+  before(async function () {
+    this.timeout(5000)
+    const fpath = path.join(__dirname, '/fixtures/example08.raml')
+    const opts = { server: { cors: true, compression: true } }
+    return ospreyMockService.loadFile(fpath, opts)
+      .then(server => {
         http = httpes.createServer(function (req, res) {
-          return raml(req, res, finalhandler(req, res))
+          return server(req, res, finalhandler(req, res))
         })
       })
   })
 
   describe('routes', function () {
     it('should expose a function', function () {
-      expect(mockService).to.be.a('function')
+      expect(ospreyMockService).to.be.a('function')
     })
 
     it('should respond with example parameter', function () {
@@ -30,8 +32,8 @@ describe('osprey mock service v0.8', function () {
         method: 'GET'
       })
         .then(function (res) {
-          expect(JSON.parse(res.body)).to.deep.equal({ success: true })
           expect(res.status).to.equal(200)
+          expect(JSON.parse(res.body)).to.deep.equal({ success: true })
         })
     })
 

@@ -1,8 +1,9 @@
-var mockService = require('../osprey-mock-service')
-var express = require('express')
-var path = require('path')
+const express = require('express')
+const path = require('path')
 
-var app
+const mockService = require('../osprey-mock-service')
+
+let app
 
 mockService.loadFile(path.join(__dirname, 'api.raml'))
   .then(function (mockApp) {

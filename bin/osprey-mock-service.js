@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 
-var http = require('http')
-var finalhandler = require('finalhandler')
-var mock = require('../')
-var Router = require('osprey').Router
-var morgan = require('morgan')
+const http = require('http')
+const finalhandler = require('finalhandler')
+const Router = require('osprey').Router
+const morgan = require('morgan')
 
-var argv = require('yargs')
+const ospreyMockService = require('../')
+
+const argv = require('yargs')
   .usage(
     'Generate an API mock server from a RAML definition.\n\n' +
     'Usage: $0 -f [file] -p [port number] --cors'
@@ -17,24 +18,26 @@ var argv = require('yargs')
   .describe('cors', 'Enable CORS with the API')
   .argv
 
-var options = {
+const options = {
   cors: !!argv.cors
 }
 
-mock.loadFile(argv.f, options)
+ospreyMockService.loadFile(argv.f, options)
   .then(function (app) {
-    var router = new Router()
+    const router = new Router()
 
     // Log API requests.
     router.use(morgan('combined'))
     router.use(app)
 
-    var server = http.createServer(function (req, res) {
+    const server = http.createServer(function (req, res) {
       router(req, res, finalhandler(req, res))
     })
 
     server.listen(argv.p, function () {
-      console.log('Mock service running at http://localhost:' + server.address().port)
+      console.log(
+        'Mock service running at http://localhost:' +
+        server.address().port)
     })
   })
   .catch(function (err) {

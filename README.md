@@ -37,21 +37,24 @@ npm install osprey-mock-service --save
 The mocking service simply accepts a RAML definition and returns a router that can be mounted into any Connect-style middleware layer or even used with `http`. Best used with `osprey` to support incoming validation automatically.
 
 ```js
-var mockService = require('../osprey-mock-service')
-var express = require('express')
-var parser = require('raml-1-parser')
-var path = require('path')
-var osprey = require('osprey')
+const ospreyMockService = require('osprey-mock-service')
+const express = require('express')
+const wap = require('webapi-parser').WebApiParser
+const path = require('path')
+const osprey = require('osprey')
 
-var app = express()
+async function main () {
+  const app = express()
+  const fpath = `file://${path.join(__dirname, 'api.raml')}`
+  let model = await wap.raml10.parse(fpath)
+  model = await wap.raml10.resolve(model)
 
-parser.loadRAML(path.join(__dirname, 'api.raml'), { rejectOnErrors: true })
-  .then(function (ramlApi) {
-    var raml = ramlApi.expand(true).toJSON({ serializeMetadata: false })
-    app.use(osprey.server(raml))
-    app.use(mockService(raml))
-    app.listen(3000)
-  })
+  app.use(osprey.server(model))
+  app.use(ospreyMockService(model))
+  app.listen(3000)
+}
+
+main()
 
 ```
 

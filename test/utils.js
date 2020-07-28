@@ -3,10 +3,10 @@
  * Inspired by popsicle 12.0+ code.
  */
 function makeFetcher (app) {
-  var compose = require('throwback').compose
-  var Request = require('servie').Request
-  var popsicle = require('popsicle')
-  var popsicleServer = require('popsicle-server').server
+  const compose = require('throwback').compose
+  const Request = require('servie').Request
+  const popsicle = require('popsicle')
+  const popsicleServer = require('popsicle-server').server
 
   // Set response text to "body" property to mimic popsicle v10
   // response interface.
@@ -20,8 +20,8 @@ function makeFetcher (app) {
     })
   }
 
-  var popsicleServerMiddleware = popsicleServer(app)
-  var middleware = compose([
+  const popsicleServerMiddleware = popsicleServer(app)
+  const middleware = compose([
     responseBodyMiddleware,
     popsicleServerMiddleware,
     popsicle.middleware

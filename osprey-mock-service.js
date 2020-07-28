@@ -1,6 +1,7 @@
-var Negotiator = require('negotiator')
-var resources = require('osprey-resources')
-var osprey = require('osprey')
+const Negotiator = require('negotiator')
+const ospreyResources = require('osprey-resources')
+const osprey = require('osprey')
+const ramlSanitize = require('raml-sanitize')()
 
 /**
  * Export the mock server.
@@ -13,25 +14,25 @@ module.exports.loadFile = loadFile
 /**
  * Create an Osprey server instance.
  *
- * @param  {Object}   raml
+ * @param  {webapi-parser.WebApiDocument} model
  * @return {Function}
  */
-function ospreyMockServer (raml) {
-  return resources(raml.resources, handler)
+function ospreyMockServer (model) {
+  return ospreyResources(model.encodes.endPoints, mockHandler)
 }
 
 /**
  * Create a server with Osprey and the mock service.
  *
- * @param  {Object}   raml
- * @param  {Object}   options
+ * @param  {webapi-parser.WebApiDocument} model
+ * @param  {Object} options
  * @return {Function}
  */
-function createServer (raml, options) {
-  var app = osprey.Router()
+function createServer (model, options) {
+  const app = osprey.Router()
 
-  app.use(osprey.server(raml, options))
-  app.use(ospreyMockServer(raml))
+  app.use(osprey.server(model, options))
+  app.use(ospreyMockServer(model))
   app.use(osprey.errorHandler())
 
   return app
@@ -40,15 +41,19 @@ function createServer (raml, options) {
 /**
  * Create a mock service using the base uri path.
  *
- * @param  {Object}   raml
- * @param  {Object}   options
+ * @param  {webapi-parser.WebApiDocument} model
+ * @param  {Object} options
  * @return {Function}
  */
-function createServerFromBaseUri (raml, options) {
-  var app = osprey.Router()
-  var path = (raml.baseUri || '').replace(/^(\w+:)?\/\/[^/]+/, '') || '/'
+function createServerFromBaseUri (model, options) {
+  const app = osprey.Router()
 
-  app.use(path, raml.baseUriParameters, createServer(raml, options))
+  const serverEl = model.encodes.servers[0]
+  const baseUri = (serverEl && serverEl.url.option) || ''
+  const path = baseUri.replace(/^(\w+:)?\/\/[^/]+/, '') || '/'
+
+  const baseUriParameters = (serverEl && serverEl.variables) || []
+  app.use(path, baseUriParameters, createServer(model, options))
 
   return app
 }
@@ -56,119 +61,163 @@ function createServerFromBaseUri (raml, options) {
 /**
  * Create a mock service from a filename.
  *
- * @param  {String}   filename
- * @param  {Object}   options
+ * @param  {String} fpath
+ * @param  {Object} options
  * @return {Function}
  */
-function loadFile (filename, options) {
-  options = options || {}
-  return require('raml-1-parser')
-    .loadRAML(filename, { rejectOnErrors: true })
-    .then(function (ramlApi) {
-      var raml = ramlApi.expand(true).toJSON({
-        serializeMetadata: false
-      })
-      options.RAMLVersion = ramlApi.RAMLVersion()
-      return createServerFromBaseUri(raml, options)
-    })
+async function loadFile (fpath, options) {
+  const wap = require('webapi-parser').WebApiParser
+  fpath = fpath.startsWith('file:') ? fpath : `file://${fpath}`
+  let model, resolved
+  try {
+    model = await wap.raml10.parse(fpath)
+    resolved = await wap.raml10.resolve(model)
+  } catch (e) {
+    model = await wap.raml08.parse(fpath)
+    resolved = await wap.raml08.resolve(model)
+  }
+  return createServerFromBaseUri(resolved, options || {})
 }
 
 /**
- * Returns either a random example from examples or the single example.
+ * Returns a single example of the body.
  *
- * @param {Object} obj
+ * @param {webapi-parser.AnyShape} schema
  */
-function getSingleExample (obj) {
-  if (obj.examples) {
-    var randomIndex = Math.floor(Math.random() * obj.examples.length)
-    return obj.examples[randomIndex].value || obj.examples[randomIndex]
-  } else {
-    return obj.example
+function getSchemaExample (schema) {
+  const exNode = schema.examples && schema.examples[0]
+  if (!exNode) {
+    return
   }
+  const exValue = exNode.value.option && exNode.value.option.trim()
+  const isJson = exValue && exValue.startsWith('{')
+  const isXml = exValue && exValue.startsWith('<')
+  const isStructured = !!exNode.structuredValue
+  if (!isStructured || isJson || isXml) {
+    return exValue
+  }
+  return extractDataNodeValue(exNode.structuredValue)
+}
+
+/**
+ * Extracts data from DataNode subclass instance.
+ *
+ * @param {webapi-parser.DataNode} dNode
+ */
+function extractDataNodeValue (dNode) {
+  // ScalarNode
+  if (dNode.dataType !== undefined) {
+    return dNode.value.option
+  }
+  // ArrayNode
+  if (dNode.members !== undefined) {
+    return dNode.members.map(extractDataNodeValue)
+  }
+  // ObjectNode
+  if (dNode.properties !== undefined) {
+    const data = {}
+    Object.keys(dNode.properties).forEach(name => {
+      data[name] = extractDataNodeValue(dNode.properties[name])
+    })
+    if (Object.keys(data).length > 0) {
+      return data
+    }
+  }
+}
+
+/**
+ * Returns a single example of the header.
+ *
+ * @param {webapi-parser.Parameter} header
+ */
+function getHeaderExample (header) {
+  const example = (
+    header.schema.examples &&
+    header.schema.examples[0] &&
+    header.schema.examples[0].value.option)
+  return example ? example.trim() : undefined
 }
 
 /**
  * Create a RAML example method handler.
  *
- * @param  {Object}   method
+ * @param  {webapi-parser.Operation} method
  * @return {Function}
  */
-function handler (method) {
-  var statusCode = getStatusCode(method)
-  var response = (method.responses || {})[statusCode] || {}
-  var bodies = response.body || {}
-  var headers = {}
-  var types = Object.keys(bodies)
+function mockHandler (method) {
+  const response = method.responses && method.responses[0]
+  const statusCode = response
+    ? parseInt(response.statusCode.value())
+    : 200
 
   // Set up the default response headers.
-  if (response.headers) {
-    Object.keys(response.headers).forEach(function (headerName) {
-      var header = response.headers[headerName]
-      if (header.default) {
-        headers[header.name] = header.default
-      } else if (header.example || header.examples) {
-        var example = getSingleExample(header)
-        headers[header.name] = example
+  const headers = {}
+  if (response && response.headers) {
+    response.headers.forEach(header => {
+      const defaultVal = (
+        header.schema.defaultValueStr &&
+        header.schema.defaultValueStr.option)
+      const example = getHeaderExample(header)
+      if (defaultVal) {
+        headers[header.name.value()] = defaultVal
+      } else if (example) {
+        headers[header.name.value()] = example
       }
     })
   }
 
+  const bodies = {}
+  if (response) {
+    response.payloads.forEach(pl => {
+      bodies[pl.mediaType.value()] = pl
+    })
+  }
+  const types = Object.keys(bodies)
+
   return function (req, res) {
-    var negotiator = new Negotiator(req)
-    var type = negotiator.mediaType(types)
+    const negotiator = new Negotiator(req)
+    let type = negotiator.mediaType(types)
     if (req.params && (req.params.mediaTypeExtension || req.params.ext)) {
-      var ext = req.params.mediaTypeExtension || req.params.ext
+      let ext = req.params.mediaTypeExtension || req.params.ext
       ext = ext.slice(1)
       type = 'application/' + ext
     }
-    var body = bodies[type] || {}
+    const body = bodies[type] || {}
 
-    if (body && body.properties) {
-      var propertiesExample = Object.keys(body.properties).reduce(function (example, property) {
-        if (body.properties[property].example) {
-          example[property] = body.properties[property].example
-        }
-        return example
-      }, {})
-    }
     res.statusCode = statusCode
     setHeaders(res, headers)
 
     if (type) {
       res.setHeader('Content-Type', type)
-      var example = body.example
-
-      // Parse body.examples
-      if (Array.isArray(body.examples)) {
-        body.examples = body.examples.map(function (ex) {
-          if (ex.structuredValue) {
-            return ex.structuredValue
-          } else {
-            return ex
-          }
-        })
-        example = getSingleExample(body)
-      }
+      const example = getSchemaExample(body.schema)
+      const sanitizer = ramlSanitize(body.schema.properties)
+      const sanitize = (obj) => typeof obj === 'object' ? sanitizer(obj) : obj
 
       if (example) {
-        res.write(typeof example !== 'string' ? JSON.stringify(example) : example)
-      } else if (propertiesExample) {
-        res.write(typeof propertiesExample === 'object' ? JSON.stringify(propertiesExample) : propertiesExample)
+        res.write(typeof example !== 'string'
+          ? JSON.stringify(sanitize(example))
+          : example)
+      } else {
+        let propertiesExample
+        if (body && body.schema && body.schema.properties) {
+          propertiesExample = {}
+          body.schema.properties.forEach(prop => {
+            const exampleVal = getSchemaExample(prop.range)
+            if (exampleVal) {
+              propertiesExample[prop.name.value()] = exampleVal
+            }
+          })
+        }
+        if (propertiesExample) {
+          res.write(typeof propertiesExample === 'object'
+            ? JSON.stringify(sanitize(propertiesExample))
+            : propertiesExample)
+        }
       }
     }
 
     res.end()
   }
-}
-
-/**
- * Get an appropriate HTTP response code.
- *
- * @param  {Object} method
- * @return {Number}
- */
-function getStatusCode (method) {
-  return Object.keys(method.responses || {})[0] || 200
 }
 
 /**
