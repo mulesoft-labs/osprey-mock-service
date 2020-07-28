@@ -48,9 +48,9 @@
     "finalhandler": "^1.1.1",
     "morgan": "^1.7.0",
     "negotiator": "^0.6.0",
-    "osprey": "^0.6.1",
-    "osprey-resources": "^0.9.1",
-    "raml-sanitize": "^1.4.0",
+    "osprey": "^1.0.0",
+    "osprey-resources": "^1.0.0",
+    "raml-sanitize": "^2.0.0",
     "webapi-parser": "^0.4.0",
     "yargs": "^15.3.1"
   }
