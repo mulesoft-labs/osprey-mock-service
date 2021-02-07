@@ -169,26 +169,33 @@ function mockHandler (method) {
     const preferredResponses = getRawHeaderValue(req, 'Mock-Preferred-Responses')
     const preferredResponse = preferredResponses
       ? JSON.parse(preferredResponses)[resourceMethod]
-      : 200
+      : null
 
     var response = null
     var statusCode = null
-    if (mockMethod.responses) {
-      mockMethod.responses.forEach(mockResponse => {
-        const mockStatusCode = parseInt(mockResponse.statusCode)
-        if (mockStatusCode === preferredResponse) {
-          response = mockResponse
-          statusCode = mockStatusCode
-        }
-      })
-      if (!response) {
-        if (mockMethod.responses.length > 0) {
+    if (mockMethod.responses && mockMethod.responses.length > 0) {
+      if (preferredResponse) {
+        mockMethod.responses.forEach(mockResponse => {
+          const mockStatusCode = parseInt(mockResponse.statusCode)
+          if (mockStatusCode === preferredResponse) {
+            response = mockResponse
+            statusCode = mockStatusCode
+          }
+        })
+        if (!response) {
           response = mockMethod.responses[0]
-          statusCode = parseInt(mockMethod.responses[0].statusCode)
-        } else {
-          statusCode = 200
+          statusCode = preferredResponse
         }
       }
+      if (!response) {
+        response = mockMethod.responses[0]
+        statusCode = mockMethod.responses[0].statusCode
+      }
+    }
+    if (!response && preferredResponse) {
+      statusCode = preferredResponse
+    } else if (!response) {
+      statusCode = 200
     }
 
     // Set up the default response headers.
