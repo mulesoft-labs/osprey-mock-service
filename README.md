@@ -64,6 +64,45 @@ main()
 * `createServerFromBaseUri` Creates a mock service with Osprey and uses the base URI path
 * `loadFile` Creates a mock service with Osprey and the base URI path from a RAML file
 
+### Preferred responses
+
+Clients of mock service may provive HTTP header called `Mock-Preferred-Responses` to choose which of example responses should be returned.
+
+For example, in case of API definition such as:
+
+```
+#%RAML 1.0
+title: Example API
+baseUri: http://localhost:3000/api/{version}
+version: v1
+
+/example:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "message": "success"
+              }
+      400:
+        body:
+          application/json:
+            example: |
+              {
+                "message": "failure"
+              }
+```
+
+Client could choose to receive 400 response, by providing `Mock-Preferred-Responses` HTTP header with value:
+
+```
+{
+  "GET /example": 400
+}
+```
+
 ## License
 
 Apache License 2.0

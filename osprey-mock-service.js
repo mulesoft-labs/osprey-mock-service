@@ -100,6 +100,23 @@ function getSchemaExample (schema) {
 }
 
 /**
+ * Returns value of raw header, if included in request.
+ *
+ * @param {HTTP.Request} req
+ * @param {String} header
+ * @return {String}
+ */
+function getRawHeaderValue (req, header) {
+  for (var i = 0; i < req.rawHeaders.length; i += 2) {
+    if (req.rawHeaders[i] === header) {
+      if (i + 1 < req.rawHeaders.length) {
+        return req.rawHeaders[i + 1]
+      }
+    }
+  }
+}
+
+/**
  * Extracts data from DataNode subclass instance.
  *
  * @param {webapi-parser.DataNode} dNode
@@ -145,36 +162,66 @@ function getHeaderExample (header) {
  * @return {Function}
  */
 function mockHandler (method) {
-  const response = method.responses && method.responses[0]
-  const statusCode = response
-    ? parseInt(response.statusCode.value())
-    : 200
-
-  // Set up the default response headers.
-  const headers = {}
-  if (response && response.headers) {
-    response.headers.forEach(header => {
-      const defaultVal = (
-        header.schema.defaultValueStr &&
-        header.schema.defaultValueStr.option)
-      const example = getHeaderExample(header)
-      if (defaultVal) {
-        headers[header.name.value()] = defaultVal
-      } else if (example) {
-        headers[header.name.value()] = example
-      }
-    })
-  }
-
-  const bodies = {}
-  if (response) {
-    response.payloads.forEach(pl => {
-      bodies[pl.mediaType.value()] = pl
-    })
-  }
-  const types = Object.keys(bodies)
+  const mockMethod = method
 
   return function (req, res) {
+    const resourceMethod = req.method + ' ' + req.resourcePath
+    const preferredResponses = getRawHeaderValue(req, 'Mock-Preferred-Responses')
+    const preferredResponse = preferredResponses
+      ? JSON.parse(preferredResponses)[resourceMethod]
+      : null
+
+    var response = null
+    var statusCode = null
+    if (mockMethod.responses && mockMethod.responses.length > 0) {
+      if (preferredResponse) {
+        mockMethod.responses.forEach(mockResponse => {
+          const mockStatusCode = parseInt(mockResponse.statusCode)
+          if (mockStatusCode === preferredResponse) {
+            response = mockResponse
+            statusCode = mockStatusCode
+          }
+        })
+        if (!response) {
+          response = mockMethod.responses[0]
+          statusCode = preferredResponse
+        }
+      }
+      if (!response) {
+        response = mockMethod.responses[0]
+        statusCode = mockMethod.responses[0].statusCode
+      }
+    }
+    if (!response && preferredResponse) {
+      statusCode = preferredResponse
+    } else if (!response) {
+      statusCode = 200
+    }
+
+    // Set up the default response headers.
+    const headers = {}
+    if (response && response.headers) {
+      response.headers.forEach(header => {
+        const defaultVal = (
+          header.schema.defaultValueStr &&
+          header.schema.defaultValueStr.option)
+        const example = getHeaderExample(header)
+        if (defaultVal) {
+          headers[header.name.value()] = defaultVal
+        } else if (example) {
+          headers[header.name.value()] = example
+        }
+      })
+    }
+
+    const bodies = {}
+    if (response) {
+      response.payloads.forEach(pl => {
+        bodies[pl.mediaType.value()] = pl
+      })
+    }
+    const types = Object.keys(bodies)
+
     const negotiator = new Negotiator(req)
     let type = negotiator.mediaType(types)
     if (req.params && (req.params.mediaTypeExtension || req.params.ext)) {
