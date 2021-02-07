@@ -12,6 +12,27 @@ baseUri: http://127.0.0.1
       200:
         body:
           application/json:
-            example:
-              firstname: john
-              lastname: doe
+            example: |
+              {
+                "users": [
+                  {
+                    "firstname": "john",
+                    "lastname": "doe"
+                  }
+                ],
+                "message": "ok"
+              }
+      400:
+        body:
+          application/json:
+            example: |
+              {
+                "users": []
+                "message": "failure"
+              }
+/groups:
+  get:
+    headers:
+      Authorized:
+        type: string
+        enum: [yes]
